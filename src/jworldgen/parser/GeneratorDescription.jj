@@ -1,0 +1,43 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(eg1)package jworldgen.parser;
+
+public class eg1{  public static void main(String args []) throws ParseException  {    eg1 parser = new eg1(System.in);    while (true)    {      System.out.println("Reading from standard input...");      System.out.print("Enter an expression like \"1+(2+3)*4;\" :");      try      {        switch (eg1.one_line())        {          case 0 :           System.out.println("OK.");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        eg1.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(eg1)SKIP :{  " "| "\r"| "\t"| "\n"}TOKEN : /* Partitions */{  < BLOCK : "Block" >| < ROOM : "Room" >| < AREA : "Area" >| < SUBAREA : "SubArea" >}
+TOKEN : /* Block Keys */
+{
+  < ID : "ID" >
+}
+
+TOKEN : /* Room Keys */
+{
+  < WBLOCK : "WallBlock" >
+| < FBLOCK : "FloorBlock" >
+| < CBLOCK : "CeilingBlock" >
+| < BG : "Background" >
+}
+TOKEN :{  < CONSTANT : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
+| < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >}int one_line() :{}{  room() ";"  {    return 0;  }| ";"  {    return 1;  }}
+
+void blockLine() :
+{}
+{  < ID > "=" < IDENT >    
+}
+
+void roomLine() :
+{}
+{
+  < WBLOCK > "=" < IDENT >
+| < FBLOCK > "=" < IDENT >
+| < CBLOCK > "=" < IDENT >
+| < BG > "=" < IDENT >
+}
+void block() :
+{}{  < BLOCK > < IDENT > "{" (blockLine())* "}"
+}
+
+void room() :
+{}
+{
+  < ROOM > < IDENT > "{" (roomLine())* "}"
+}
+void element() :{}{  < CONSTANT >| "(" room() ")"}
