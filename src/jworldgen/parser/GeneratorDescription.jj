@@ -3,12 +3,15 @@
  */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(RuleParser)package jworldgen.parser;
 
 import java.io.StringReader;
-import jworldgen.filehandler.TextFileReader;
+import jworldgen.parser.parseStructure.*;
 
-public class RuleParser{  public static void main(String args []) throws ParseException  {
-    String input = TextFileReader.readTextFile("data/TestRules.txt");
-    StringReader reader = new StringReader(input);    RuleParser parser = new RuleParser(reader);
-        System.out.println("Reading TestRules.txt");    try    {      System.out.println(RuleParser.partition());    }    catch (Exception e)    {      System.out.println("NOK.");      System.out.println(e.getMessage());    }    catch (Error e)    {      System.out.println("Oops.");      System.out.println(e.getMessage());    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
+public class RuleParser{  public static ParseList parse(String ruleCode) throws ParseException  {
+    StringReader reader = new StringReader(ruleCode);    RuleParser parser = new RuleParser(reader);
+        System.out.println("Reading Code");    try    {      ParseList list = RuleParser.parseRoot();
+      System.out.println(list.toString());
+      return list;    }    catch (Exception e)    {      System.out.println("NOK.");      System.out.println(e.getMessage());
+      return null;    }    catch (Error e)    {      System.out.println("Oops.");      System.out.println(e.getMessage());
+      return null;    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
 | "/*": IN_COMMENT}
 
 < IN_COMMENT > SKIP:{
@@ -29,8 +32,8 @@ TOKEN : /* Room Keys */
 
 TOKEN : /* Area Keys */
 {
-  < PROB : "Prob" (< DIGIT >)+ >
-| < TYPE: "Type" (< DIGIT >)+ >
+  < PROB : "Prob" >
+| < TYPE : "Type" >
 }
 
 TOKEN : /* SubArea Keys */
@@ -43,66 +46,164 @@ TOKEN : /* SubArea Keys */
 | < HEIGHT : "height" >
 | < COUNT : "count" >
 }
-TOKEN : /* Misc Identifiers */{  < CONSTANT : (< DIGIT >)+ >
-| < VALEXP : (< DIGIT >)+ | "$" < IDENT > >| < #DIGIT : [ "0"-"9" ] >
+TOKEN : /* Misc Identifiers */{  < CONSTANT : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
 | < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
-| < COMBEXP : < VALEXP > ":" < VALEXP > >
-| < PROBEXP : < FLOAT > ":" < FLOAT > >
-| < #FLOAT : < CONSTANT > "." < CONSTANT > | < CONSTANT > >}
+| < FLOAT : < CONSTANT > "." < CONSTANT > >}
 
-Token probExp():{Token t;}{(t = < COMBEXP > | t = < PROBEXP >){return t;}}Token valExp():{Token t;}{(t = < CONSTANT > | t = < VALEXP >){return t;}}    int partition() :{int x;}{  room() x = partition()
+ParseList parseRoot():
+{ParseList list = new ParseList();}
+{	partition(list)
+	{
+	  return list;	}
+}void partition(ParseList list) :{ParseRoom room; ParseArea area;}{  room = room() partition(list)
   {
-    return 2*x;
+    list.addRoom(room);
   }
   
-| area() x = partition()
+| area = area() partition(list)
   {
-    return 2*x+1;
+    list.addArea(area);
   }
-| < EOF >
+| < EOF >}
+
+void roomLine(ParseRoom room) :
+{Token block;}
+{
+  < WBLOCK > "=" block = < IDENT >
   {
-    return 0;  }}
-
-void roomLine() :
-{}
-{
-  < WBLOCK > "=" < IDENT >
-| < FBLOCK > "=" < IDENT >
-| < CBLOCK > "=" < IDENT >
-| < BG > "=" < IDENT >
+    room.setWalls(block.image);  }
+| < FBLOCK > "=" block = < IDENT >
+  {
+    room.setFloor(block.image);
+  }
+| < CBLOCK > "=" block = < IDENT >
+  {
+    room.setCeiling(block.image);
+  }
+| < BG > "=" block = < IDENT >
+  {
+    room.setBackground(block.image);
+  }
 }
 
-void areaLine() :
-{}
+void areaLine(ParseArea area) :
+{Token probType; int id;}
 {
-  < PROB > "=" < CONSTANT >
-| < TYPE > "=" < IDENT >
+  id = prob() "=" probType = < CONSTANT >
+  {
+    area.addProbability(Integer.parseInt(probType.image),id);  }
+|
+  id = type() "=" probType = < IDENT >
+  {
+    area.addType(probType.image,id);
+  }
 }
 
-void subAreaLine() :
-{}
+void subAreaLine(ParseSubArea subArea) :
+{Token identifier; Integer leftInt = 0; Integer rightInt = 0; Float leftFloat = 0f; Float rightFloat = 0f;}
 {
-  < ATYPE > "=" < IDENT >
-| < RTYPE > "=" < IDENT >
-| < COUNT > "=" < COMBEXP >
-| < XPOS > "=" probExp()
-| < YPOS > "=" probExp()
-| < WIDTH > "=" probExp()
-| < HEIGHT > "=" probExp()
+  < ATYPE > "=" identifier = < IDENT >
+  {
+    subArea.setAreaType(identifier.image);  }
+| < RTYPE > "=" identifier = < IDENT >
+  {
+    subArea.setRoomType(identifier.image);
+  }
+| < COUNT > "=" combExp(leftInt,rightInt)
+  {
+    subArea.setCount(leftInt,rightInt);
+  }
+| < XPOS > "=" probExp(leftFloat,rightFloat)
+  {
+    subArea.setXPos(leftFloat,rightFloat);
+  }
+| < YPOS > "=" probExp(leftFloat,rightFloat)
+  {
+    subArea.setYPos(leftFloat,rightFloat);
+  }
+| < WIDTH > "=" probExp(leftFloat,rightFloat)
+  {
+    subArea.setWidth(leftFloat,rightFloat);
+  }
+| < HEIGHT > "=" probExp(leftFloat,rightFloat)
+  {
+    subArea.setHeight(leftFloat,rightFloat);
+  }
 }
 
-void room() :
-{}
+ParseRoom room() :
+{ParseRoom room = new ParseRoom();}
 {
-  < ROOM > < IDENT > "{" (roomLine())* "}"
+  < ROOM > < IDENT > "{" (roomLine(room))* "}"
+  {	return room;
+  }
 }
 
-void subArea():
+void subArea(ParseArea area):
+{ParseSubArea subArea = new ParseSubArea();}
+{
+  < SUBAREA > "{" (subAreaLine(subArea))* "}"
+  {	area.addSubArea(subArea);
+  }}
+
+ParseArea area():
+{ParseArea area = new ParseArea();}
+{  < AREA > < IDENT > "{" (areaLine(area) | subArea(area))* "}"
+  {	return area;
+  }
+}
+
+void combExp(Integer leftVal, Integer rightVal):
+{}
+{	leftVal = intValExp() ":" rightVal = intValExp()
+}
+
+int intValExp():
+{Token t;}{	t = < CONSTANT >
+	{		return Integer.parseInt(t.image);
+	}
+|   t = "$n"
+	{		return -1;
+	}
+|   t = "$i"
+	{
+		return -2;
+	}
+}
+
+float floatValExp():
+{Token t;}
+{
+	t = < FLOAT >
+	{
+		return Float.parseFloat(t.image);
+	}
+|   t = "$n"
+	{
+		return -1;
+	}
+|   t = "$i"
+	{
+		return -2;
+	}
+}
+
+void probExp(Float leftVal, Float rightVal):
 {}
 {
-  < SUBAREA > "{" (subAreaLine())* "}"}
-
-void area():
-{}
-{  < AREA > < IDENT > "{" (areaLine() | subArea())* "}"
+	leftVal = floatValExp() ":" rightVal = floatValExp()
 }
+
+int prob():
+{Token id;}
+{	< PROB > id = < CONSTANT >
+	{		return Integer.parseInt(id.image);
+	}	
+}
+
+int type():
+{Token id;}{
+  < TYPE > id = < CONSTANT >
+	{
+		return Integer.parseInt(id.image);
+	}}  
