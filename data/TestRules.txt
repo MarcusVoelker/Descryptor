@@ -1,0 +1,49 @@
+Room TestRoom {
+	WallBlock = Wall
+	FloorBlock = Floor
+	CeilingBlock = Ceiling
+	Background = StoneWall
+}
+
+Area World {
+	Prob1 = 1
+	Type1 = None
+	
+	SubArea {
+		AreaType = Sky
+		count = 1:0
+		xPos = 0.5:0
+		yPos = 0.25:0
+		width = 1:0
+		height = 0.5:0
+	}
+	
+	SubArea {
+		AreaType = Ground
+		count = 1:0
+		xPos = 0.5:0
+		yPos = 0.75:0
+		width = 1:0
+		height = 0.5:0
+	}
+}
+
+Area Sky {
+	Prob1 = 1
+	Type1 = None
+}
+
+Area Ground {
+	Prob1 = 1
+	Type1 = Earth
+	Prob2 = 1
+	Type2 = Stone
+	SubArea {
+		RoomType = TestRoom
+		count = 10:5
+		xPos = $i:0
+		yPos = 0.1:0
+		width = $n:0
+		height = 0.2:0
+	}
+}
