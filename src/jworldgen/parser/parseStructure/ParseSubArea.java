@@ -3,10 +3,10 @@ package jworldgen.parser.parseStructure;
 public class ParseSubArea {
 	private String areaType;
 	private boolean isArea;
-	private int count;
-	private int countVariance;
 	
 	// $i = -1; $n = -2
+	private int count;
+	private int countVariance;
 	private float xPos;
 	private float xPosVar;
 	private float yPos;
@@ -56,5 +56,11 @@ public class ParseSubArea {
 	{
 		this.height = value;
 		this.heightVar = variance;
+	}
+	
+	public Object resolve()
+	{
+		
+		return null;
 	}
 }

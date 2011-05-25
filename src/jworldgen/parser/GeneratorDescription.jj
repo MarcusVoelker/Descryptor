@@ -132,10 +132,11 @@ void subAreaLine(ParseSubArea subArea) :
 }
 
 ParseRoom room() :
-{ParseRoom room = new ParseRoom();}
+{ParseRoom room = new ParseRoom(); Token ident;}
 {
-  < ROOM > < IDENT > "{" (roomLine(room))* "}"
-  {	return room;
+  < ROOM > ident = < IDENT > "{" (roomLine(room))* "}"
+  {
+    room.setIdentifier(ident.image);	return room;
   }
 }
 
@@ -147,9 +148,10 @@ void subArea(ParseArea area):
   }}
 
 ParseArea area():
-{ParseArea area = new ParseArea();}
-{  < AREA > < IDENT > "{" (areaLine(area) | subArea(area))* "}"
-  {	return area;
+{ParseArea area = new ParseArea(); Token ident;}
+{  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area))* "}"
+  {
+    area.setIdentifier(ident.image);	return area;
   }
 }
 

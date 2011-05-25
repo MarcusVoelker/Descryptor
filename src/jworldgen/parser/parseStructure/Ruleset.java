@@ -4,29 +4,21 @@ import java.util.Hashtable;
 
 public class Ruleset 
 {
-	private Hashtable<String,Integer> blockMap;
+	private BlockMap blockMap;
+	private Hashtable<String,TreeNodeRoom> rooms;
+	private Hashtable<String,TreeNodeArea> areas;
+	
 	public Ruleset(ParseList list)
 	{
-		blockMap = new Hashtable<String,Integer>();
+		blockMap = new BlockMap();
 		createFromParseList(list);
-	}
-	
-	public static int addToBlockmap(Hashtable<String,Integer> blockmap, Integer maxID, String key)
-	{
-		if (blockmap.containsKey(key))
-		{
-			return blockmap.get(key);
-		}
-		else
-		{
-			blockmap.put(key, ++maxID);
-			return maxID;
-		}
 	}
 	
 	private void createFromParseList(ParseList list)
 	{
-		
+		list.insertBlockIDs(blockMap);
+		rooms = list.createRoomNodes();
+		areas = list.createAreaNodes();
 	}
 	
 	

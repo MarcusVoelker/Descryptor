@@ -8,6 +8,7 @@ public class ParseArea {
 	private ArrayList<ParseSubArea> subAreas;
 	private Hashtable<Integer,Integer> probabilities;
 	private Hashtable<Integer,String> tileTypes;
+	private String identifier;
 	
 	private Hashtable<Integer,Integer> tileIDs;
 	
@@ -33,15 +34,30 @@ public class ParseArea {
 		tileTypes.put(id, tileType);
 	}
 	
-	public void insertBlockIDs(Hashtable<String,Integer> blockmap, Integer maxID)
+	public void setIdentifier (String identifier)
+	{
+		this.identifier = identifier;
+	}
+	
+	public String getIdentifier()
+	{
+		return identifier;
+	}
+	
+	public void insertBlockIDs(BlockMap blockmap)
 	{
 		tileIDs = new Hashtable<Integer,Integer>();
 		for (Enumeration<Integer> e = tileTypes.keys(); e.hasMoreElements();)
 		{
 			Integer hashKey = e.nextElement();
 			String blockType = tileTypes.get( hashKey );
-			Integer id = Ruleset.addToBlockmap(blockmap,maxID,blockType);
+			Integer id = blockmap.registerBlock(blockType);
 			tileIDs.put(hashKey, id);
 		}
+	}
+	
+	public TreeNodeArea toAreaNode()
+	{
+		return new TreeNodeArea(subAreas,probabilities,tileIDs);
 	}
 }

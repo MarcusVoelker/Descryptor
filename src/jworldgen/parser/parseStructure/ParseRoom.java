@@ -1,12 +1,12 @@
 package jworldgen.parser.parseStructure;
 
-import java.util.Hashtable;
 
 public class ParseRoom {
 	private String floor;
 	private String ceiling;
 	private String walls;
 	private String background;
+	private String identifier;
 	private int floorID;
 	private int ceilingID;
 	private int wallID;
@@ -32,11 +32,25 @@ public class ParseRoom {
 		this.background = background;
 	}
 	
-	public void insertBlockIDs(Hashtable<String,Integer> blockmap, Integer maxID)
+	public void setIdentifier (String identifier)
 	{
-		floorID = Ruleset.addToBlockmap(blockmap,maxID,floor);
-		ceilingID = Ruleset.addToBlockmap(blockmap,maxID,ceiling);
-		wallID = Ruleset.addToBlockmap(blockmap,maxID,walls);
-		backgroundID = Ruleset.addToBlockmap(blockmap,maxID,background);
+		this.identifier = identifier;
+	}
+	
+	public String getIdentifier()
+	{
+		return identifier;
+	}
+	public void insertBlockIDs(BlockMap blockmap)
+	{
+		floorID = blockmap.registerBlock(floor);
+		ceilingID = blockmap.registerBlock(ceiling);
+		wallID = blockmap.registerBlock(walls);
+		backgroundID = blockmap.registerBlock(background);
+	}
+	
+	public TreeNodeRoom toRoomNode()
+	{
+		return new TreeNodeRoom(floorID, ceilingID, wallID, backgroundID);
 	}
 }
