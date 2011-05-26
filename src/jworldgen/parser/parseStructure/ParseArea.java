@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import jworldgen.generator.worldStructure.TreeNodeArea;
+
 public class ParseArea {
 	private ArrayList<ParseSubArea> subAreas;
 	private Hashtable<Integer,Integer> probabilities;
@@ -58,6 +60,6 @@ public class ParseArea {
 	
 	public TreeNodeArea toAreaNode()
 	{
-		return new TreeNodeArea(subAreas,probabilities,tileIDs);
+		return new TreeNodeArea(subAreas,probabilities,tileIDs,identifier);
 	}
 }

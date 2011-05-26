@@ -1,10 +1,11 @@
-package jworldgen.parser.parseStructure;
+package jworldgen.generator.worldStructure;
 
 public class TreeNodeRoom {
 	private int floorID;
 	private int ceilingID;
 	private int wallID;
 	private int backgroundID;
+	private String identifier;
 	
 	private int count;
 	private int countVariance;
@@ -17,12 +18,13 @@ public class TreeNodeRoom {
 	private float height;
 	private float heightVar;
 	
-	public TreeNodeRoom(int floorID, int ceilingID, int wallID, int backgroundID)
+	public TreeNodeRoom(int floorID, int ceilingID, int wallID, int backgroundID, String identifier)
 	{
 		this.floorID = floorID;
 		this.ceilingID = ceilingID;
 		this.wallID = wallID;
 		this.backgroundID = backgroundID;
+		this.identifier = identifier;
 	}
 	
 	public void setCount(int value, int variance)
@@ -53,5 +55,15 @@ public class TreeNodeRoom {
 	{
 		this.height = value;
 		this.heightVar = variance;
+	}
+	
+	public String getIdentifier()
+	{
+		return identifier;
+	}
+	
+	public TreeNodeRoom clone()
+	{
+		return new TreeNodeRoom(floorID,ceilingID,wallID,backgroundID,identifier);
 	}
 }

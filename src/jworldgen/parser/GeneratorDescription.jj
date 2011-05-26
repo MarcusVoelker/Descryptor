@@ -100,34 +100,39 @@ void areaLine(ParseArea area) :
 }
 
 void subAreaLine(ParseSubArea subArea) :
-{Token identifier; Integer leftInt = 0; Integer rightInt = 0; Float leftFloat = 0f; Float rightFloat = 0f;}
+{Token identifier; int[] ints; float[] floats;}
 {
   < ATYPE > "=" identifier = < IDENT >
   {
-    subArea.setAreaType(identifier.image);  }
+    subArea.areaType = identifier.image;  }
 | < RTYPE > "=" identifier = < IDENT >
   {
-    subArea.setRoomType(identifier.image);
+    subArea.areaType = identifier.image;
   }
-| < COUNT > "=" combExp(leftInt,rightInt)
+| < COUNT > "=" ints = combExp()
   {
-    subArea.setCount(leftInt,rightInt);
+    subArea.count = ints[0];
+    subArea.countVar = ints[1];
   }
-| < XPOS > "=" probExp(leftFloat,rightFloat)
+| < XPOS > "=" floats = probExp()
   {
-    subArea.setXPos(leftFloat,rightFloat);
+    subArea.xPos = floats[0];
+    subArea.xPosVar = floats[1];
   }
-| < YPOS > "=" probExp(leftFloat,rightFloat)
+| < YPOS > "=" floats = probExp()
   {
-    subArea.setYPos(leftFloat,rightFloat);
+    subArea.yPos = floats[0];
+    subArea.yPosVar = floats[1];
   }
-| < WIDTH > "=" probExp(leftFloat,rightFloat)
+| < WIDTH > "=" floats = probExp()
   {
-    subArea.setWidth(leftFloat,rightFloat);
+    subArea.width = floats[0];
+    subArea.widthVar = floats[1];
   }
-| < HEIGHT > "=" probExp(leftFloat,rightFloat)
+| < HEIGHT > "=" floats = probExp()
   {
-    subArea.setHeight(leftFloat,rightFloat);
+    subArea.height = floats[0];
+    subArea.heightVar = floats[1];
   }
 }
 
@@ -155,9 +160,11 @@ ParseArea area():
   }
 }
 
-void combExp(Integer leftVal, Integer rightVal):
-{}
+int[] combExp():
+{int leftVal; int rightVal;}
 {	leftVal = intValExp() ":" rightVal = intValExp()
+	{
+	  return new int[]{leftVal,rightVal};	}
 }
 
 int intValExp():
@@ -190,10 +197,12 @@ float floatValExp():
 	}
 }
 
-void probExp(Float leftVal, Float rightVal):
-{}
+float[] probExp():
+{float leftVal; float rightVal;}
 {
 	leftVal = floatValExp() ":" rightVal = floatValExp()
+	{		return new float[]{leftVal,rightVal};
+	}	  
 }
 
 int prob():

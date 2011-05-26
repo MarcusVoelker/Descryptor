@@ -3,6 +3,9 @@ package jworldgen.parser.parseStructure;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import jworldgen.generator.worldStructure.TreeNodeArea;
+import jworldgen.generator.worldStructure.TreeNodeRoom;
+
 public class ParseList {
 	private ArrayList<ParseRoom> rooms;
 	private ArrayList<ParseArea> areas;

@@ -1,10 +1,10 @@
 package jworldgen.test;
 
 import jworldgen.filehandler.TextFileReader;
+import jworldgen.generator.worldStructure.Ruleset;
 import jworldgen.parser.ParseException;
 import jworldgen.parser.RuleParser;
 import jworldgen.parser.parseStructure.ParseList;
-import jworldgen.parser.parseStructure.Ruleset;
 
 public class TestStartup {
 	public static void main(String[] args)

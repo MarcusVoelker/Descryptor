@@ -1,5 +1,7 @@
 package jworldgen.parser.parseStructure;
 
+import jworldgen.generator.worldStructure.TreeNodeRoom;
+
 
 public class ParseRoom {
 	private String floor;
@@ -51,6 +53,6 @@ public class ParseRoom {
 	
 	public TreeNodeRoom toRoomNode()
 	{
-		return new TreeNodeRoom(floorID, ceilingID, wallID, backgroundID);
+		return new TreeNodeRoom(floorID, ceilingID, wallID, backgroundID, identifier);
 	}
 }
