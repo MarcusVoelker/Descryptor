@@ -12,6 +12,8 @@ public class RNG {
 	
 	public int nextInt(int center, int spread)
 	{
+		if(spread == 0)
+			return center;
 		return randomCore.nextInt(spread*2)+center;
 	}
 	

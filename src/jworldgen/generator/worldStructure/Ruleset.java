@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import jworldgen.generator.RNG;
 import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
 
@@ -16,6 +17,7 @@ public class Ruleset
 	{
 		blockMap = new BlockMap();
 		createFromParseList(list);
+		world.expandToWorldTree(new RNG(0), 1, 1, 0, 0, 0, 0);
 	}
 	
 	private void createFromParseList(ParseList list)
@@ -41,6 +43,11 @@ public class Ruleset
 			}
 		}
 		world = areas.get("World");
+		world.setCount(1, 0);
+		world.setHeight(1, 0);
+		world.setWidth(1, 0);
+		world.setXPos(0, 0);
+		world.setYPos(0, 0);
 	}
 	
 	public TreeNodeArea getWorld()

@@ -3,6 +3,7 @@ package jworldgen.generator.worldStructure;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import jworldgen.generator.RNG;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
 public class TreeNodeArea {
@@ -123,11 +124,61 @@ public class TreeNodeArea {
 	
 	public TreeNodeArea clone()
 	{
-		return new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, rooms, identifier);
+		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, rooms, identifier);
+		newArea.setCount(count, countVariance);
+		newArea.setHeight(height, heightVar);
+		newArea.setWidth(width, widthVar);
+		newArea.setXPos(xPos, xPosVar);
+		newArea.setYPos(yPos, yPosVar);
+		return newArea;
 	}
 	
-	public WorldArea toWorldArea()
+	private int calculateCount(RNG rng)
 	{
-		return new WorldArea();
+		return rng.nextInt(count, countVariance);
+	}
+	
+	private float calculateFloat(RNG rng, float curVal, float variance, int index, int subCount)
+	{
+		if (curVal == -1) {
+			curVal = index*1.0f/subCount;
+		} else if (curVal == -2) {
+			curVal = 1.0f/subCount;
+		} 
+		return  rng.nextFloat(curVal, variance);
+		
+	}
+	
+	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
+	{
+		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
+		ArrayList<TreeNodeRoom> realRooms = new ArrayList<TreeNodeRoom>();
+		width = calculateFloat(rng,width,widthVar,index,subCount)*parentWidth;
+		height = calculateFloat(rng,height,heightVar,index,subCount)*parentHeight;
+		xPos = calculateFloat(rng,xPos,xPosVar,index,subCount)*parentXPos;
+		yPos = calculateFloat(rng,yPos,yPosVar,index,subCount)*parentYPos;
+		
+		xPos+=parentXPos;
+		yPos+=parentYPos;
+		for (TreeNodeArea tna: subAreas)
+		{
+			int newSubCount = tna.calculateCount(rng);
+			for (int i = 0; i < newSubCount; i++)
+			{
+				TreeNodeArea newArea = tna.clone();
+				newArea.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
+				realSubAreas.add(newArea);
+			}
+		}
+		for (TreeNodeRoom tnr: rooms)
+		{
+			int newSubCount = tnr.calculateCount(rng);
+			for (int i = 0; i < newSubCount; i++)
+			{
+				TreeNodeRoom newRoom = tnr.clone();
+				newRoom.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
+				realRooms.add(newRoom);
+			}
+		}
 	}
 }
