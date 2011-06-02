@@ -5,16 +5,19 @@ import jworldgen.generator.worldStructure.TreeNodeArea;
 
 public class Generator {
 	
-	Ruleset rules;
-	RNG randomNumberGenerator;
+	private Ruleset rules;
+	private RNG randomNumberGenerator;
 	public Generator (Ruleset rules)
 	{
 		this.rules = rules;
 	}
 	
-	public void generateFromSeed(long seed)
+	public World generateFromSeed(long seed, int width, int height)
 	{
 		this.randomNumberGenerator = new RNG(seed);
 		TreeNodeArea world = rules.getWorld();
+		World blockWorld = new World(width,height);
+		world.fillWorld(randomNumberGenerator,blockWorld);
+		return blockWorld;
 	}
 }

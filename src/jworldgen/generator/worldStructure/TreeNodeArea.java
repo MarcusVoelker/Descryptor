@@ -1,9 +1,11 @@
 package jworldgen.generator.worldStructure;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import jworldgen.generator.RNG;
+import jworldgen.generator.World;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
 public class TreeNodeArea {
@@ -12,36 +14,45 @@ public class TreeNodeArea {
 	private Hashtable<Integer,Integer> tileIDs;
 	
 	private ArrayList<TreeNodeArea> subAreas;
-	private ArrayList<TreeNodeRoom> rooms;
 	
-	private String identifier;
+	protected String identifier;
 	
-	private int count;
-	private int countVariance;
-	private float xPos;
-	private float xPosVar;
-	private float yPos;
-	private float yPosVar;
-	private float width;
-	private float widthVar;
-	private float height;
-	private float heightVar;
+	protected int count;
+	protected int countVariance;
+	protected float xPos;
+	protected float xPosVar;
+	protected float yPos;
+	protected float yPosVar;
+	protected float width;
+	protected float widthVar;
+	protected float height;
+	protected float heightVar;
 	
+	private int probSum;
+	
+	public TreeNodeArea()
+	{
+		subAreas = new ArrayList<TreeNodeArea>();
+	}
 	public TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> tileIDs, String identifier)
 	{
+		this();
 		this.parseSubAreas = parseSubAreas;
 		this.probabilities = probabilities;
 		this.tileIDs = tileIDs;
 		this.identifier = identifier;
-		subAreas = new ArrayList<TreeNodeArea>();
-		rooms = new ArrayList<TreeNodeRoom>();
+		probSum = 0;
+		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
+		{
+			Integer key = e.nextElement();
+			probSum += probabilities.get(key);
+		}
 	}
 	
-	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> tileIDs, ArrayList<TreeNodeArea> subAreas,ArrayList<TreeNodeRoom> rooms,String identifier)
+	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> tileIDs, ArrayList<TreeNodeArea> subAreas,String identifier)
 	{
 		this(parseSubAreas,probabilities,tileIDs,identifier);
 		this.subAreas = subAreas;
-		this.rooms = rooms;
 	}
 	
 	public void setCount(int value, int variance)
@@ -107,7 +118,7 @@ public class TreeNodeArea {
 	}
 	public void addRoom(TreeNodeRoom room)
 	{
-		rooms.add(room);
+		subAreas.add(room);
 		String roomName = room.getIdentifier();
 		for (ParseSubArea parseSubArea : parseSubAreas)
 		{
@@ -124,7 +135,7 @@ public class TreeNodeArea {
 	
 	public TreeNodeArea clone()
 	{
-		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, rooms, identifier);
+		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, identifier);
 		newArea.setCount(count, countVariance);
 		newArea.setHeight(height, heightVar);
 		newArea.setWidth(width, widthVar);
@@ -133,17 +144,17 @@ public class TreeNodeArea {
 		return newArea;
 	}
 	
-	private int calculateCount(RNG rng)
+	protected  int calculateCount(RNG rng)
 	{
 		return rng.nextInt(count, countVariance);
 	}
 	
-	private float calculateFloat(RNG rng, float curVal, float variance, int index, int subCount)
+	protected float calculateFloat(RNG rng, float curVal, float variance, int index, int subCount)
 	{
 		if (curVal == -1) {
-			curVal = index*1.0f/subCount;
-		} else if (curVal == -2) {
 			curVal = 1.0f/subCount;
+		} else if (curVal == -2) {
+			curVal = index*1.0f/subCount;
 		} 
 		return  rng.nextFloat(curVal, variance);
 		
@@ -152,14 +163,11 @@ public class TreeNodeArea {
 	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
 	{
 		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
-		ArrayList<TreeNodeRoom> realRooms = new ArrayList<TreeNodeRoom>();
 		width = calculateFloat(rng,width,widthVar,index,subCount)*parentWidth;
 		height = calculateFloat(rng,height,heightVar,index,subCount)*parentHeight;
-		xPos = calculateFloat(rng,xPos,xPosVar,index,subCount)*parentXPos;
-		yPos = calculateFloat(rng,yPos,yPosVar,index,subCount)*parentYPos;
+		xPos = calculateFloat(rng,xPos,xPosVar,index,subCount)*parentWidth+parentXPos;
+		yPos = calculateFloat(rng,yPos,yPosVar,index,subCount)*parentHeight+parentYPos;
 		
-		xPos+=parentXPos;
-		yPos+=parentYPos;
 		for (TreeNodeArea tna: subAreas)
 		{
 			int newSubCount = tna.calculateCount(rng);
@@ -170,15 +178,46 @@ public class TreeNodeArea {
 				realSubAreas.add(newArea);
 			}
 		}
-		for (TreeNodeRoom tnr: rooms)
+		subAreas = realSubAreas;
+	}
+	
+	protected int getNextTileId(RNG rng)
+	{
+		int probValue = rng.nextAreaInt(0,probSum);
+		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
 		{
-			int newSubCount = tnr.calculateCount(rng);
-			for (int i = 0; i < newSubCount; i++)
+			int curElement = e.nextElement();
+			probValue -= probabilities.get(curElement);
+			if (probValue < 0)
+				return tileIDs.get(curElement);
+		}
+		return 0;		
+	}
+	
+	public void fillWorld(RNG rng, World world)
+	{
+		
+		for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor((xPos+width)*world.getWidth()); x++)
+		{
+			for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor((yPos+height)*world.getHeight()); y++)
 			{
-				TreeNodeRoom newRoom = tnr.clone();
-				newRoom.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
-				realRooms.add(newRoom);
+				world.setValue(x, y, getNextTileId(rng));
 			}
 		}
+		
+		for (TreeNodeArea tna: subAreas)
+		{
+			tna.fillWorld(rng, world);
+		}
+	}
+	
+	public String toString()
+	{
+		String subs = "";
+		for (TreeNodeArea tna: subAreas)
+		{
+			subs += tna.toString()+ " ";
+		}
+		return identifier+": ("+xPos+", "+yPos+") SubAreas:"+"("+subs+")";
 	}
 }

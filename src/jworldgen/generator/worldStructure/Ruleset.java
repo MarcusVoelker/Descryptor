@@ -17,7 +17,6 @@ public class Ruleset
 	{
 		blockMap = new BlockMap();
 		createFromParseList(list);
-		world.expandToWorldTree(new RNG(0), 1, 1, 0, 0, 0, 0);
 	}
 	
 	private void createFromParseList(ParseList list)
@@ -60,5 +59,13 @@ public class Ruleset
 		return blockMap;
 	}
 	
+	public void expandToWorldTree(RNG rng)
+	{
+		world.expandToWorldTree(rng, 1, 1, 0, 0, 0, 0);
+	}
+	public String toString()
+	{
+		return world.toString();
+	}
 	
 }

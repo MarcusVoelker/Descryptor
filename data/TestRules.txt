@@ -12,8 +12,8 @@ Area World {
 	SubArea {
 		AreaType = Sky
 		count = 1:0
-		xPos = 0.5:0.0
-		yPos = 0.25:0.0
+		xPos = 0.0:0.0
+		yPos = 0.0:0.0
 		width = 1.0:0.0
 		height = 0.5:0.0
 	}
@@ -21,8 +21,8 @@ Area World {
 	SubArea {
 		AreaType = Ground
 		count = 1:0
-		xPos = 0.5:0.0
-		yPos = 0.75:0.0
+		xPos = 0.0:0.0
+		yPos = 0.5:0.0
 		width = 1.0:0.0
 		height = 0.5:0.0
 	}

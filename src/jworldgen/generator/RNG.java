@@ -17,6 +17,13 @@ public class RNG {
 		return randomCore.nextInt(spread*2)+center;
 	}
 	
+	public int nextAreaInt(int low, int high)
+	{
+		if (high == low)
+			return low;
+		return randomCore.nextInt(high-low)+low;
+	}
+	
 	public float nextFloat (float center, float spread)
 	{
 		return randomCore.nextFloat()*spread*2+center;
