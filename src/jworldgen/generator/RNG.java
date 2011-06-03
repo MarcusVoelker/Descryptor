@@ -26,6 +26,6 @@ public class RNG {
 	
 	public float nextFloat (float center, float spread)
 	{
-		return randomCore.nextFloat()*spread*2+center;
+		return randomCore.nextFloat()*spread*2+center-spread;
 	}
 }

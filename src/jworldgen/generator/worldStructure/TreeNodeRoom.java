@@ -26,15 +26,30 @@ public class TreeNodeRoom extends TreeNodeArea{
 		tnr.setWidth(width, widthVar);
 		tnr.setXPos(xPos, xPosVar);
 		tnr.setYPos(yPos, yPosVar);
+		if (isStamp)
+			tnr.makeStamp();
 		return tnr;
 	}
 	
 	public void fillWorld(RNG rng, World world)
 	{
-		int left = (int) Math.floor(xPos*world.getWidth());
-		int right = (int) Math.floor((xPos+width)*world.getWidth());
-		int top = (int) Math.floor(yPos*world.getHeight());
-		int bottom = (int) Math.floor((yPos+height)*world.getHeight());
+		int left;
+		int right;
+		int top;
+		int bottom;
+		left = (int) Math.floor(xPos*world.getWidth());
+		top = (int) Math.floor(yPos*world.getHeight());
+		
+		if (isStamp)
+		{
+			right = Math.round(left+width*2);
+			bottom = Math.round(top+height*2);
+		}
+		else
+		{
+			right = (int) Math.floor((xPos+width)*world.getWidth());
+			bottom = (int) Math.floor((yPos+height)*world.getHeight());
+		}
 		
 		for (int x = left+1; x < right-1; x++)
 		{

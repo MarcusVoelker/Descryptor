@@ -20,7 +20,16 @@ public class World {
 	
 	public void setValue(int x, int y, int value)
 	{
+		if (x >= getWidth() || y >= getHeight())
+		{
+			return;
+		}
 		rawData[x][y] = value;
+	}
+	
+	public int getValue(int x, int y)
+	{
+		return rawData[x][y];
 	}
 	
 	public String toString()

@@ -17,7 +17,6 @@ public class TextFileReader {
 	    	reader = new BufferedReader(new FileReader(file));
 	        String text = null;
 
-	        // repeat until all lines is read
 	        while ((text = reader.readLine()) != null)
 	        	contents.append(text).append(System.getProperty("line.separator"));
 
@@ -34,7 +33,7 @@ public class TextFileReader {
 	                e.printStackTrace();
 	            }
 	        }
-	        // show file contents here
+
 	        return contents.toString();
 	    }
 	}

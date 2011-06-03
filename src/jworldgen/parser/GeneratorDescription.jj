@@ -8,7 +8,7 @@ import jworldgen.parser.parseStructure.*;
 public class RuleParser{  public static ParseList parse(String ruleCode) throws ParseException  {
     StringReader reader = new StringReader(ruleCode);    RuleParser parser = new RuleParser(reader);
         System.out.println("Reading Code");    try    {      ParseList list = RuleParser.parseRoot();
-      System.out.println(list.toString());
+      System.out.println("No syntactic errors detected");
       return list;    }    catch (Exception e)    {      System.out.println("NOK.");      System.out.println(e.getMessage());
       return null;    }    catch (Error e)    {      System.out.println("Oops.");      System.out.println(e.getMessage());
       return null;    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
@@ -20,7 +20,8 @@ public class RuleParser{  public static ParseList parse(String ruleCode) throw
 {
   "*/": DEFAULT
 }
-TOKEN : /* Partitions */{  < ROOM : "Room" >| < AREA : "Area" >| < SUBAREA : "SubArea" >}
+TOKEN : /* Partitions */{  < ROOM : "Room" >| < AREA : "Area" >| < SUBAREA : "SubArea" >
+| < STAMP : "Stamp" >}
 
 TOKEN : /* Room Keys */
 {
@@ -136,6 +137,44 @@ void subAreaLine(ParseSubArea subArea) :
   }
 }
 
+void stampLine(ParseSubArea subArea) :
+{Token identifier; int[] ints; float[] floats;}
+{
+  < ATYPE > "=" identifier = < IDENT >
+  {
+    subArea.areaType = identifier.image;
+  }
+| < RTYPE > "=" identifier = < IDENT >
+  {
+    subArea.areaType = identifier.image;
+  }
+| < COUNT > "=" ints = combExp()
+  {
+    subArea.count = ints[0];
+    subArea.countVar = ints[1];
+  }
+| < XPOS > "=" floats = probExp()
+  {
+    subArea.xPos = floats[0];
+    subArea.xPosVar = floats[1];
+  }
+| < YPOS > "=" floats = probExp()
+  {
+    subArea.yPos = floats[0];
+    subArea.yPosVar = floats[1];
+  }
+| < WIDTH > "=" ints = combExp()
+  {
+    subArea.width = ints[0];
+    subArea.widthVar = ints[1];
+  }
+| < HEIGHT > "=" ints = combExp()
+  {
+    subArea.height = ints[0];
+    subArea.heightVar = ints[1];
+  }
+}
+
 ParseRoom room() :
 {ParseRoom room = new ParseRoom(); Token ident;}
 {
@@ -146,15 +185,25 @@ ParseRoom room() :
 }
 
 void subArea(ParseArea area):
-{ParseSubArea subArea = new ParseSubArea();}
+{ParseSubArea subArea = new ParseSubArea(); subArea.isStamp = false;}
 {
   < SUBAREA > "{" (subAreaLine(subArea))* "}"
   {	area.addSubArea(subArea);
   }}
 
+void stamp(ParseArea area):
+{ParseSubArea subArea = new ParseSubArea(); subArea.isStamp = true;}
+{
+  < STAMP > "{" (stampLine(subArea))* "}"
+  {
+	area.addSubArea(subArea);
+  }
+}
+
+
 ParseArea area():
 {ParseArea area = new ParseArea(); Token ident;}
-{  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area))* "}"
+{  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area) | stamp(area))* "}"
   {
     area.setIdentifier(ident.image);	return area;
   }
