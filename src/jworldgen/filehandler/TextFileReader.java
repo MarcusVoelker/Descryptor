@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.LoggerLevel;
+
 public class TextFileReader {
 
 	public static String readTextFile(String filename) {
@@ -21,16 +24,16 @@ public class TextFileReader {
 	        	contents.append(text).append(System.getProperty("line.separator"));
 
 	        } catch (FileNotFoundException e) {
-	            e.printStackTrace();
+	            ExceptionHandler.logException(e, LoggerLevel.CRITICAL);
 	        } catch (IOException e) {
-	            e.printStackTrace();
+	        	ExceptionHandler.logException(e, LoggerLevel.CRITICAL);
 	        } finally {
 	            try {
 	                if (reader != null) {
 	                    reader.close();
 	                }
 	            } catch (IOException e) {
-	                e.printStackTrace();
+	            	ExceptionHandler.logException(e, LoggerLevel.CRITICAL);
 	            }
 	        }
 

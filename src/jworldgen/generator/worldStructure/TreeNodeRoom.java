@@ -21,11 +21,11 @@ public class TreeNodeRoom extends TreeNodeArea{
 	public TreeNodeRoom clone()
 	{
 		TreeNodeRoom tnr = new TreeNodeRoom(floorID,ceilingID,wallID,backgroundID,identifier);
-		tnr.setCount(count, countVariance);
-		tnr.setHeight(height, heightVar);
-		tnr.setWidth(width, widthVar);
-		tnr.setXPos(xPos, xPosVar);
-		tnr.setYPos(yPos, yPosVar);
+		tnr.setCount(countLow, countHigh);
+		tnr.setHeight(heightLow, heightHigh);
+		tnr.setWidth(widthLow, widthHigh);
+		tnr.setXPos(xPosLow, xPosHigh);
+		tnr.setYPos(yPosLow, yPosHigh);
 		if (isStamp)
 			tnr.makeStamp();
 		return tnr;
@@ -37,18 +37,18 @@ public class TreeNodeRoom extends TreeNodeArea{
 		int right;
 		int top;
 		int bottom;
-		left = (int) Math.floor(xPos*world.getWidth());
-		top = (int) Math.floor(yPos*world.getHeight());
+		left = (int) Math.floor(xPosLow*world.getWidth());
+		top = (int) Math.floor(yPosLow*world.getHeight());
 		
 		if (isStamp)
 		{
-			right = Math.round(left+width*2);
-			bottom = Math.round(top+height*2);
+			right = Math.round(left+widthLow*2);
+			bottom = Math.round(top+heightLow*2);
 		}
 		else
 		{
-			right = (int) Math.floor((xPos+width)*world.getWidth());
-			bottom = (int) Math.floor((yPos+height)*world.getHeight());
+			right = (int) Math.floor((xPosLow+widthLow)*world.getWidth());
+			bottom = (int) Math.floor((yPosLow+heightLow)*world.getHeight());
 		}
 		
 		for (int x = left+1; x < right-1; x++)
@@ -72,9 +72,9 @@ public class TreeNodeRoom extends TreeNodeArea{
 	
 	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
 	{
-		width = calculateFloat(rng,width,widthVar,index,subCount)*parentWidth;
-		height = calculateFloat(rng,height,heightVar,index,subCount)*parentHeight;
-		xPos = calculateFloat(rng,xPos,xPosVar,index,subCount)*parentWidth+parentXPos;
-		yPos = calculateFloat(rng,yPos,yPosVar,index,subCount)*parentHeight+parentYPos;
+		widthLow = calculateFloat(rng,widthLow,widthHigh,index,subCount)*parentWidth;
+		heightLow = calculateFloat(rng,heightLow,heightHigh,index,subCount)*parentHeight;
+		xPosLow = calculateFloat(rng,xPosLow,xPosHigh,index,subCount)*parentWidth+parentXPos;
+		yPosLow = calculateFloat(rng,yPosLow,yPosHigh,index,subCount)*parentHeight+parentYPos;
 	}
 }

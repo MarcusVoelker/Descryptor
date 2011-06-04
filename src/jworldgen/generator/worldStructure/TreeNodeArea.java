@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.LoggerLevel;
+import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
 import jworldgen.generator.World;
 import jworldgen.parser.parseStructure.ParseSubArea;
@@ -17,16 +20,16 @@ public class TreeNodeArea {
 	
 	protected String identifier;
 	
-	protected int count;
-	protected int countVariance;
-	protected float xPos;
-	protected float xPosVar;
-	protected float yPos;
-	protected float yPosVar;
-	protected float width;
-	protected float widthVar;
-	protected float height;
-	protected float heightVar;
+	protected int countLow;
+	protected int countHigh;
+	protected float xPosLow;
+	protected float xPosHigh;
+	protected float yPosLow;
+	protected float yPosHigh;
+	protected float widthLow;
+	protected float widthHigh;
+	protected float heightLow;
+	protected float heightHigh;
 	
 	protected boolean isStamp = false;
 	
@@ -58,34 +61,34 @@ public class TreeNodeArea {
 		this.subAreas = subAreas;
 	}
 	
-	public void setCount(int value, int variance)
+	public void setCount(int low, int high)
 	{
-		this.count = value;
-		this.countVariance = variance;
+		this.countLow = low;
+		this.countHigh = high;
 	}
 	
-	public void setXPos(float value, float variance)
+	public void setXPos(float low, float high)
 	{
-		this.xPos = value;
-		this.xPosVar = variance;
+		this.xPosLow = low;
+		this.xPosHigh = high;
 	}
 	
-	public void setYPos(float value, float variance)
+	public void setYPos(float low, float high)
 	{
-		this.yPos = value;
-		this.yPosVar = variance;
+		this.yPosLow = low;
+		this.yPosHigh = high;
 	}
 	
-	public void setWidth(float value, float variance)
+	public void setWidth(float low, float high)
 	{
-		this.width = value;
-		this.widthVar = variance;
+		this.widthLow = low;
+		this.widthHigh = high;
 	}
 	
-	public void setHeight(float value, float variance)
+	public void setHeight(float low, float high)
 	{
-		this.height = value;
-		this.heightVar = variance;
+		this.heightLow = low;
+		this.heightHigh = high;
 	}
 	
 	public void makeStamp()
@@ -108,15 +111,20 @@ public class TreeNodeArea {
 	{
 		subAreas.add(area);
 		String areaName = area.getIdentifier();
+		if (areaName.equals(identifier))
+		{
+			ExceptionHandler.logException(new RecursionException(), LoggerLevel.ERROR);
+			return;
+		}
 		for (ParseSubArea parseSubArea : parseSubAreas)
 		{
 			if (parseSubArea.areaType.equals(areaName))
 			{
-				area.setCount(parseSubArea.count,parseSubArea.countVar);
-				area.setXPos(parseSubArea.xPos,parseSubArea.xPosVar);
-				area.setYPos(parseSubArea.yPos,parseSubArea.yPosVar);
-				area.setWidth(parseSubArea.width,parseSubArea.widthVar);
-				area.setHeight(parseSubArea.height,parseSubArea.heightVar);
+				area.setCount(parseSubArea.countLow,parseSubArea.countHigh);
+				area.setXPos(parseSubArea.xPosLow,parseSubArea.xPosHigh);
+				area.setYPos(parseSubArea.yPosLow,parseSubArea.yPosHigh);
+				area.setWidth(parseSubArea.widthLow,parseSubArea.widthHigh);
+				area.setHeight(parseSubArea.heightLow,parseSubArea.heightHigh);
 				if (parseSubArea.isStamp)
 					area.makeStamp();
 			}
@@ -135,11 +143,11 @@ public class TreeNodeArea {
 		{
 			if (parseSubArea.areaType.equals(roomName))
 			{
-				room.setCount(parseSubArea.count,parseSubArea.countVar);
-				room.setXPos(parseSubArea.xPos,parseSubArea.xPosVar);
-				room.setYPos(parseSubArea.yPos,parseSubArea.yPosVar);
-				room.setWidth(parseSubArea.width,parseSubArea.widthVar);
-				room.setHeight(parseSubArea.height,parseSubArea.heightVar);
+				room.setCount(parseSubArea.countLow,parseSubArea.countHigh);
+				room.setXPos(parseSubArea.xPosLow,parseSubArea.xPosHigh);
+				room.setYPos(parseSubArea.yPosLow,parseSubArea.yPosHigh);
+				room.setWidth(parseSubArea.widthLow,parseSubArea.widthHigh);
+				room.setHeight(parseSubArea.heightLow,parseSubArea.heightHigh);
 				if (parseSubArea.isStamp)
 					room.makeStamp();
 				parseSubAreas.remove(parseSubArea);
@@ -151,11 +159,11 @@ public class TreeNodeArea {
 	public TreeNodeArea clone()
 	{
 		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, identifier);
-		newArea.setCount(count, countVariance);
-		newArea.setHeight(height, heightVar);
-		newArea.setWidth(width, widthVar);
-		newArea.setXPos(xPos, xPosVar);
-		newArea.setYPos(yPos, yPosVar);
+		newArea.setCount(countLow, countHigh);
+		newArea.setHeight(heightLow, heightHigh);
+		newArea.setWidth(widthLow, widthHigh);
+		newArea.setXPos(xPosLow, xPosHigh);
+		newArea.setYPos(yPosLow, yPosHigh);
 		if (isStamp)
 			newArea.makeStamp();
 		return newArea;
@@ -163,29 +171,35 @@ public class TreeNodeArea {
 	
 	protected  int calculateCount(RNG rng)
 	{
-		return rng.nextInt(count, countVariance);
+		return rng.nextInt(countLow, countHigh);
 	}
 	
-	protected float calculateFloat(RNG rng, float curVal, float variance, int index, int subCount)
+	protected float resolveSymbolicValue(float symbol, int index, int subCount)
 	{
-		if (curVal == -1) {
-			curVal = 1.0f/subCount;
-		} else if (curVal == -2) {
-			curVal = index*1.0f/subCount;
+		if (symbol == -1) {
+			return 1.0f/subCount;
+		} else if (symbol == -2) {
+			return index*1.0f/subCount;
 		} 
-		return  rng.nextFloat(curVal, variance);
+		return symbol;
+	}
+	protected float calculateFloat(RNG rng, float low, float high, int index, int subCount)
+	{
+		low = resolveSymbolicValue(low,index,subCount);
+		high = resolveSymbolicValue(high,index,subCount);
+		return  rng.nextFloat(low, high);
 		
 	}
 	
 	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
 	{
 		
-		xPos = calculateFloat(rng,xPos,xPosVar,index,subCount)*parentWidth+parentXPos;
-		yPos = calculateFloat(rng,yPos,yPosVar,index,subCount)*parentHeight+parentYPos;
+		xPosLow = calculateFloat(rng,xPosLow,xPosHigh,index,subCount)*parentWidth+parentXPos;
+		yPosLow = calculateFloat(rng,yPosLow,yPosHigh,index,subCount)*parentHeight+parentYPos;
 		if (!isStamp)
 		{
-			width = calculateFloat(rng,width,widthVar,index,subCount)*parentWidth;
-			height = calculateFloat(rng,height,heightVar,index,subCount)*parentHeight;
+			widthLow = calculateFloat(rng,widthLow,widthHigh,index,subCount)*parentWidth;
+			heightLow = calculateFloat(rng,heightLow,heightHigh,index,subCount)*parentHeight;
 		}
 		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
 		
@@ -195,7 +209,7 @@ public class TreeNodeArea {
 			for (int i = 0; i < newSubCount; i++)
 			{
 				TreeNodeArea newArea = tna.clone();
-				newArea.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
+				newArea.expandToWorldTree(rng, heightLow, widthLow, xPosLow, yPosLow, i, newSubCount);
 				realSubAreas.add(newArea);
 			}
 		}
@@ -204,7 +218,7 @@ public class TreeNodeArea {
 	
 	protected int getNextTileId(RNG rng)
 	{
-		int probValue = rng.nextAreaInt(0,probSum);
+		int probValue = rng.nextInt(0,probSum);
 		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
 		{
 			int curElement = e.nextElement();
@@ -219,18 +233,18 @@ public class TreeNodeArea {
 	{
 		if (isStamp)
 		{
-			for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor(xPos*world.getWidth()+width); x++)
+			for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor(xPosLow*world.getWidth()+widthLow); x++)
 			{
-				for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor(yPos*world.getHeight()+height); y++)
+				for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor(yPosLow*world.getHeight()+heightLow); y++)
 				{
 					world.setValue(x, y, getNextTileId(rng));
 				}
 			}
 			return;
 		}
-		for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor((xPos+width)*world.getWidth()); x++)
+		for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor((xPosLow+widthLow)*world.getWidth()); x++)
 		{
-			for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor((yPos+height)*world.getHeight()); y++)
+			for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor((yPosLow+heightLow)*world.getHeight()); y++)
 			{
 				world.setValue(x, y, getNextTileId(rng));
 			}
@@ -249,6 +263,6 @@ public class TreeNodeArea {
 		{
 			subs += tna.toString()+ " ";
 		}
-		return identifier+": ("+xPos+", "+yPos+") SubAreas:"+"("+subs+")";
+		return identifier+": ("+xPosLow+", "+yPosLow+") SubAreas:"+"("+subs+")";
 	}
 }

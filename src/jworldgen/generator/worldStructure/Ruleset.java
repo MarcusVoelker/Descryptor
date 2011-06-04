@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.LoggerLevel;
+import jworldgen.exceptionHandler.NoWorldException;
 import jworldgen.generator.RNG;
 import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
@@ -17,6 +20,7 @@ public class Ruleset
 	{
 		blockMap = new BlockMap();
 		createFromParseList(list);
+		ExceptionHandler.log("Ruleset successfully created!", LoggerLevel.COARSE);
 	}
 	
 	private void createFromParseList(ParseList list)
@@ -42,9 +46,13 @@ public class Ruleset
 			}
 		}
 		world = areas.get("World");
-		world.setCount(1, 0);
-		world.setHeight(1, 0);
-		world.setWidth(1, 0);
+		if (world == null)
+		{
+			ExceptionHandler.logException(new NoWorldException(), LoggerLevel.CRITICAL);
+		}
+		world.setCount(1, 1);
+		world.setHeight(1, 1);
+		world.setWidth(1, 1);
 		world.setXPos(0, 0);
 		world.setYPos(0, 0);
 	}

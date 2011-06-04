@@ -20,7 +20,7 @@ public class World {
 	
 	public void setValue(int x, int y, int value)
 	{
-		if (x >= getWidth() || y >= getHeight())
+		if (x >= getWidth() || y >= getHeight() || x < 0 || y < 0)
 		{
 			return;
 		}

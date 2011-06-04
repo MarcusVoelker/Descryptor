@@ -4,13 +4,15 @@
 
 import java.io.StringReader;
 import jworldgen.parser.parseStructure.*;
+import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.LoggerLevel;
 
 public class RuleParser{  public static ParseList parse(String ruleCode) throws ParseException  {
     StringReader reader = new StringReader(ruleCode);    RuleParser parser = new RuleParser(reader);
-        System.out.println("Reading Code");    try    {      ParseList list = RuleParser.parseRoot();
-      System.out.println("No syntactic errors detected");
-      return list;    }    catch (Exception e)    {      System.out.println("NOK.");      System.out.println(e.getMessage());
-      return null;    }    catch (Error e)    {      System.out.println("Oops.");      System.out.println(e.getMessage());
+        ExceptionHandler.log("Reading input...", LoggerLevel.COARSE);    try    {      ParseList list = RuleParser.parseRoot();
+      ExceptionHandler.log("No syntactic errors detected", LoggerLevel.COARSE);
+      return list;    }    catch (Exception e)    {      ExceptionHandler.logException(e,LoggerLevel.CRITICAL);
+      return null;    }    catch (Error e)    {      ExceptionHandler.logException(e,LoggerLevel.CRITICAL);
       return null;    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
 | "/*": IN_COMMENT}
 
@@ -112,28 +114,28 @@ void subAreaLine(ParseSubArea subArea) :
   }
 | < COUNT > "=" ints = combExp()
   {
-    subArea.count = ints[0];
-    subArea.countVar = ints[1];
+    subArea.countLow = ints[0];
+    subArea.countHigh = ints[1];
   }
 | < XPOS > "=" floats = probExp()
   {
-    subArea.xPos = floats[0];
-    subArea.xPosVar = floats[1];
+    subArea.xPosLow = floats[0];
+    subArea.xPosHigh = floats[1];
   }
 | < YPOS > "=" floats = probExp()
   {
-    subArea.yPos = floats[0];
-    subArea.yPosVar = floats[1];
+    subArea.yPosLow = floats[0];
+    subArea.yPosHigh = floats[1];
   }
 | < WIDTH > "=" floats = probExp()
   {
-    subArea.width = floats[0];
-    subArea.widthVar = floats[1];
+    subArea.widthLow = floats[0];
+    subArea.widthHigh = floats[1];
   }
 | < HEIGHT > "=" floats = probExp()
   {
-    subArea.height = floats[0];
-    subArea.heightVar = floats[1];
+    subArea.heightLow = floats[0];
+    subArea.heightHigh = floats[1];
   }
 }
 
@@ -150,28 +152,28 @@ void stampLine(ParseSubArea subArea) :
   }
 | < COUNT > "=" ints = combExp()
   {
-    subArea.count = ints[0];
-    subArea.countVar = ints[1];
+    subArea.countLow = ints[0];
+    subArea.countHigh = ints[1];
   }
 | < XPOS > "=" floats = probExp()
   {
-    subArea.xPos = floats[0];
-    subArea.xPosVar = floats[1];
+    subArea.xPosLow = floats[0];
+    subArea.xPosHigh = floats[1];
   }
 | < YPOS > "=" floats = probExp()
   {
-    subArea.yPos = floats[0];
-    subArea.yPosVar = floats[1];
+    subArea.yPosLow = floats[0];
+    subArea.yPosHigh = floats[1];
   }
 | < WIDTH > "=" ints = combExp()
   {
-    subArea.width = ints[0];
-    subArea.widthVar = ints[1];
+    subArea.widthLow = ints[0];
+    subArea.widthHigh = ints[1];
   }
 | < HEIGHT > "=" ints = combExp()
   {
-    subArea.height = ints[0];
-    subArea.heightVar = ints[1];
+    subArea.heightLow = ints[0];
+    subArea.heightHigh = ints[1];
   }
 }
 

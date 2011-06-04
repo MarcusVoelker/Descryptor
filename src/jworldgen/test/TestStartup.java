@@ -21,7 +21,7 @@ public class TestStartup {
 		try {
 			ParseList list = RuleParser.parse(input);
 			Ruleset rules = new Ruleset(list);
-			rules.expandToWorldTree(new RNG(0));
+			rules.expandToWorldTree(new RNG());
 			Generator gen = new Generator(rules);
 			World world = gen.generateFromSeed(0, 100, 100);
 			System.out.println(rules.toString());
