@@ -1,7 +1,7 @@
 package jworldgen.exceptionHandler;
 
 public enum LoggerLevel {
-	NONE (0, ""), CRITICAL (1, "CRITICAL"), ERROR (2, "ERROR"), COARSE (3, "Log"), FINE (4, "Log"), FINEST (5, "Log");
+	NONE (0, ""), CRITICAL (1, "CRITICAL"), ERROR (2, "ERROR"), WARNING (3, "WARNING"), COARSE (4, "Log"), FINE (5, "Log"), FINEST (6, "Log");
 	
 	private int value;
 	private String logKind;

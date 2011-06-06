@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.CriticalFailure;
+import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.NoWorldException;
+import jworldgen.exceptionHandler.UnknownIdentifier;
 import jworldgen.generator.RNG;
 import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
@@ -16,14 +18,14 @@ public class Ruleset
 	private BlockMap blockMap;
 	private TreeNodeArea world;
 	
-	public Ruleset(ParseList list)
+	public Ruleset(ParseList list) throws CriticalFailure
 	{
 		blockMap = new BlockMap();
 		createFromParseList(list);
-		ExceptionHandler.log("Ruleset successfully created!", LoggerLevel.COARSE);
+		ExceptionLogger.log("Ruleset successfully created", LoggerLevel.COARSE);
 	}
 	
-	private void createFromParseList(ParseList list)
+	private void createFromParseList(ParseList list) throws CriticalFailure
 	{
 		list.insertBlockIDs(blockMap);
 		Hashtable<String,TreeNodeRoom> rooms = list.createRoomNodes();
@@ -31,30 +33,43 @@ public class Ruleset
 		for (Enumeration<String> e = areas.keys(); e.hasMoreElements();)
 		{
 			String areaName = e.nextElement();
+			ExceptionLogger.log("Parsing Area \""+areaName+"\"", LoggerLevel.FINE);
 			ArrayList<String> subNames = areas.get(areaName).getSubAreaNames();
 			for (String name : subNames)
 			{
 				TreeNodeArea area = areas.get(name);
 				if (area != null)
 				{
+					ExceptionLogger.log("Adding SubArea \""+name+"\"", LoggerLevel.FINEST);
 					areas.get(areaName).addSubArea(area.clone());
 				}
 				else
 				{
-					areas.get(areaName).addRoom(rooms.get(name).clone());
+					if (!rooms.containsKey(name))
+					{
+						ExceptionLogger.logException(new UnknownIdentifier(name), LoggerLevel.ERROR);
+					}
+					else
+					{
+						ExceptionLogger.log("Adding Room \""+name+"\"", LoggerLevel.FINEST);
+						areas.get(areaName).addRoom(rooms.get(name).clone());
+					}
 				}
 			}
 		}
 		world = areas.get("World");
 		if (world == null)
 		{
-			ExceptionHandler.logException(new NoWorldException(), LoggerLevel.CRITICAL);
+			ExceptionLogger.logException(new NoWorldException(), LoggerLevel.CRITICAL);
 		}
-		world.setCount(1, 1);
-		world.setHeight(1, 1);
-		world.setWidth(1, 1);
-		world.setXPos(0, 0);
-		world.setYPos(0, 0);
+		else
+		{
+			world.setCount(1, 1);
+			world.setHeight(1, 1);
+			world.setWidth(1, 1);
+			world.setXPos(0, 0);
+			world.setYPos(0, 0);
+		}
 	}
 	
 	public TreeNodeArea getWorld()
@@ -70,6 +85,7 @@ public class Ruleset
 	public void expandToWorldTree(RNG rng)
 	{
 		world.expandToWorldTree(rng, 1, 1, 0, 0, 0, 0);
+		ExceptionLogger.log("World successfully expanded", LoggerLevel.COARSE);
 	}
 	public String toString()
 	{

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.CriticalFailure;
+import jworldgen.exceptionHandler.ExceptionLogger;
+import jworldgen.exceptionHandler.InvalidRangeExpression;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.RecursionException;
+import jworldgen.generator.PerlinGenerator;
 import jworldgen.generator.RNG;
 import jworldgen.generator.World;
 import jworldgen.parser.parseStructure.ParseSubArea;
@@ -61,32 +64,42 @@ public class TreeNodeArea {
 		this.subAreas = subAreas;
 	}
 	
-	public void setCount(int low, int high)
+	public void setCount(int low, int high) throws CriticalFailure
 	{
+		if (low > high)
+			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
 		this.countLow = low;
 		this.countHigh = high;
 	}
 	
-	public void setXPos(float low, float high)
+	public void setXPos(float low, float high) throws CriticalFailure
 	{
+		if (low > high)
+			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
 		this.xPosLow = low;
 		this.xPosHigh = high;
 	}
 	
-	public void setYPos(float low, float high)
+	public void setYPos(float low, float high) throws CriticalFailure
 	{
+		if (low > high)
+			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
 		this.yPosLow = low;
 		this.yPosHigh = high;
 	}
 	
-	public void setWidth(float low, float high)
+	public void setWidth(float low, float high) throws CriticalFailure
 	{
+		if (low > high)
+			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
 		this.widthLow = low;
 		this.widthHigh = high;
 	}
 	
-	public void setHeight(float low, float high)
+	public void setHeight(float low, float high) throws CriticalFailure
 	{
+		if (low > high)
+			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
 		this.heightLow = low;
 		this.heightHigh = high;
 	}
@@ -107,19 +120,21 @@ public class TreeNodeArea {
 	}
 
 	
-	public void addSubArea(TreeNodeArea area)
+	public void addSubArea(TreeNodeArea area) throws CriticalFailure
 	{
 		subAreas.add(area);
 		String areaName = area.getIdentifier();
 		if (areaName.equals(identifier))
 		{
-			ExceptionHandler.logException(new RecursionException(), LoggerLevel.ERROR);
+			ExceptionLogger.logException(new RecursionException(), LoggerLevel.ERROR);
 			return;
 		}
 		for (ParseSubArea parseSubArea : parseSubAreas)
 		{
 			if (parseSubArea.areaType.equals(areaName))
 			{
+				if (parseSubArea.countLow == 0 && parseSubArea.countHigh == 0)
+					ExceptionLogger.log("Count of SubArea \""+ areaName +"\" in Area \""+identifier+"\" is always zero!", LoggerLevel.WARNING);
 				area.setCount(parseSubArea.countLow,parseSubArea.countHigh);
 				area.setXPos(parseSubArea.xPosLow,parseSubArea.xPosHigh);
 				area.setYPos(parseSubArea.yPosLow,parseSubArea.yPosHigh);
@@ -135,7 +150,7 @@ public class TreeNodeArea {
 	{
 		return identifier;
 	}
-	public void addRoom(TreeNodeRoom room)
+	public void addRoom(TreeNodeRoom room) throws CriticalFailure
 	{
 		subAreas.add(room);
 		String roomName = room.getIdentifier();
@@ -159,11 +174,16 @@ public class TreeNodeArea {
 	public TreeNodeArea clone()
 	{
 		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, identifier);
-		newArea.setCount(countLow, countHigh);
-		newArea.setHeight(heightLow, heightHigh);
-		newArea.setWidth(widthLow, widthHigh);
-		newArea.setXPos(xPosLow, xPosHigh);
-		newArea.setYPos(yPosLow, yPosHigh);
+		try {
+			newArea.setCount(countLow, countHigh);
+			newArea.setHeight(heightLow, heightHigh);
+			newArea.setWidth(widthLow, widthHigh);
+			newArea.setXPos(xPosLow, xPosHigh);
+			newArea.setYPos(yPosLow, yPosHigh);
+		} catch (CriticalFailure e) {
+			// This block should never be reached.
+			e.printStackTrace();
+		}
 		if (isStamp)
 			newArea.makeStamp();
 		return newArea;
@@ -193,7 +213,7 @@ public class TreeNodeArea {
 	
 	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
 	{
-		
+		ExceptionLogger.log("Expanding Area \""+identifier+"\"", LoggerLevel.FINEST);
 		xPosLow = calculateFloat(rng,xPosLow,xPosHigh,index,subCount)*parentWidth+parentXPos;
 		yPosLow = calculateFloat(rng,yPosLow,yPosHigh,index,subCount)*parentHeight+parentYPos;
 		if (!isStamp)
@@ -216,28 +236,29 @@ public class TreeNodeArea {
 		subAreas = realSubAreas;
 	}
 	
-	protected int getNextTileId(RNG rng)
+	protected int getNextTileId(int x, int y, PerlinGenerator perlin)
 	{
-		int probValue = rng.nextInt(0,probSum);
+		float perlinValue = (float)perlin.noise(x, y, 1,16);
 		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
 		{
 			int curElement = e.nextElement();
-			probValue -= probabilities.get(curElement);
-			if (probValue < 0)
+			perlinValue -= ((float) probabilities.get(curElement))/probSum;
+			if (perlinValue < 0)
 				return tileIDs.get(curElement);
 		}
 		return 0;		
 	}
 	
-	public void fillWorld(RNG rng, World world)
+	public void fillWorld(RNG rng, World world, int gridSize)
 	{
+		PerlinGenerator perlin = new PerlinGenerator(rng,Math.max(world.getHeight()/gridSize,world.getWidth()/gridSize));
 		if (isStamp)
 		{
 			for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor(xPosLow*world.getWidth()+widthLow); x++)
 			{
 				for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor(yPosLow*world.getHeight()+heightLow); y++)
 				{
-					world.setValue(x, y, getNextTileId(rng));
+					world.setValue(x, y, getNextTileId(x,y,perlin));
 				}
 			}
 			return;
@@ -246,13 +267,13 @@ public class TreeNodeArea {
 		{
 			for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor((yPosLow+heightLow)*world.getHeight()); y++)
 			{
-				world.setValue(x, y, getNextTileId(rng));
+				world.setValue(x, y, getNextTileId(x,y,perlin));
 			}
 		}
 		
 		for (TreeNodeArea tna: subAreas)
 		{
-			tna.fillWorld(rng, world);
+			tna.fillWorld(rng, world,gridSize);
 		}
 	}
 	

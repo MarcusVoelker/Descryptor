@@ -1,5 +1,6 @@
 package jworldgen.test;
 
+import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.filehandler.TextFileReader;
 import jworldgen.generator.Generator;
 import jworldgen.generator.RNG;
@@ -17,14 +18,8 @@ import org.lwjgl.opengl.GL11;
 public class TestStartup {
 	public static void main(String[] args)
 	{
-		String input = TextFileReader.readTextFile("data/TestRules.txt");
 		try {
-			ParseList list = RuleParser.parse(input);
-			Ruleset rules = new Ruleset(list);
-			rules.expandToWorldTree(new RNG());
-			Generator gen = new Generator(rules);
-			World world = gen.generateFromSeed(0, 100, 100);
-			System.out.println(rules.toString());
+			World world = Generator.generateFromFile("data/TestRules.txt", 100, 100);
 			Display.setDisplayMode(new DisplayMode(500,500));
 			Display.create();
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -58,11 +53,12 @@ public class TestStartup {
 				Display.update();
 			}
 			Display.destroy();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (LWJGLException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CriticalFailure e) {
+			// TODO Auto-generated catch block
+			System.err.println(e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -4,15 +4,16 @@
 
 import java.io.StringReader;
 import jworldgen.parser.parseStructure.*;
-import jworldgen.exceptionHandler.ExceptionHandler;
+import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
+import jworldgen.exceptionHandler.CriticalFailure;
 
-public class RuleParser{  public static ParseList parse(String ruleCode) throws ParseException  {
+public class RuleParser{  public static ParseList parse(String ruleCode) throws CriticalFailure  {
     StringReader reader = new StringReader(ruleCode);    RuleParser parser = new RuleParser(reader);
-        ExceptionHandler.log("Reading input...", LoggerLevel.COARSE);    try    {      ParseList list = RuleParser.parseRoot();
-      ExceptionHandler.log("No syntactic errors detected", LoggerLevel.COARSE);
-      return list;    }    catch (Exception e)    {      ExceptionHandler.logException(e,LoggerLevel.CRITICAL);
-      return null;    }    catch (Error e)    {      ExceptionHandler.logException(e,LoggerLevel.CRITICAL);
+        ExceptionLogger.log("Reading input...", LoggerLevel.COARSE);    try    {      ParseList list = RuleParser.parseRoot();
+      ExceptionLogger.log("No syntactic errors detected", LoggerLevel.COARSE);
+      return list;    }    catch (Exception e)    {      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;    }    catch (Error e)    {      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
       return null;    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
 | "/*": IN_COMMENT}
 

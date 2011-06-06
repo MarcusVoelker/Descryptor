@@ -1,8 +1,8 @@
 package jworldgen.exceptionHandler;
 
-public class ExceptionHandler {
-	private final static LoggerLevel level = LoggerLevel.FINEST;
-	public static void logException(Throwable e, LoggerLevel logLevel)
+public class ExceptionLogger {
+	private final static LoggerLevel level = LoggerLevel.WARNING;
+	public static void logException(Throwable e, LoggerLevel logLevel) throws CriticalFailure
 	{
 		try {
 			throw e;
@@ -17,7 +17,10 @@ public class ExceptionHandler {
 				System.err.println(logLevel+": "+e1.getMessage());
 			}
 		} finally {
-			
+			if (logLevel == LoggerLevel.CRITICAL)
+			{
+				throw new CriticalFailure(e.getMessage());
+			}
 		}
 	}
 	
@@ -25,7 +28,14 @@ public class ExceptionHandler {
 	{
 		if (level.getValue() >= logLevel.getValue())
 		{
-			System.out.println(level.getLogKind()+": "+logString);
+			if (logLevel.getValue() <= LoggerLevel.WARNING.getValue())	
+			{
+				System.err.println(logLevel.getLogKind()+": "+logString);
+			}
+			else
+			{
+				System.out.println(logLevel.getLogKind()+": "+logString);
+			}
 		}
 	}
 }

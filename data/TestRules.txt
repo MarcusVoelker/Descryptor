@@ -34,9 +34,9 @@ Area Sky {
 	SubArea{
 		AreaType = Tower
 		count = 1:5
-		xPos = 0.0:0.9
+		xPos = 0.0:0.0
 		yPos = 0.1:0.1
-		width = 0.025:0.075
+		width = 0.1:0.2
 		height = 0.9:0.9
 	}
 }
@@ -54,9 +54,9 @@ Area Tower {
 	}
 }
 Area Ground {
-	Prob 1 = 1
+	Prob 1 = 4
 	Type 1 = Earth
-	Prob 2 = 1
+	Prob 2 = 5
 	Type 2 = Stone
 	SubArea {
 		RoomType = TestRoom
