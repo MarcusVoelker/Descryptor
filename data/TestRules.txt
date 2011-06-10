@@ -5,9 +5,15 @@ Room TestRoom {
 	Background = StoneWall
 }
 
-Area World {
+Modifier Stone {
 	Prob 1 = 1
 	Type 1 = None
+	Prob 2 = 1
+	Type 2 = Stone	
+}
+
+Area World {
+	Type = None
 	
 	SubArea {
 		AreaType = Sky
@@ -29,12 +35,11 @@ Area World {
 }
 
 Area Sky {
-	Prob 1 = 1
-	Type 1 = None
+	Type = None
 	SubArea{
 		AreaType = Tower
 		count = 1:5
-		xPos = 0.0:0.0
+		xPos = 0.0:0.8
 		yPos = 0.1:0.1
 		width = 0.1:0.2
 		height = 0.9:0.9
@@ -42,8 +47,7 @@ Area Sky {
 }
 
 Area Tower {
-	Prob 1 = 1
-	Type 1 = None
+	Type = None
 	SubArea {
 		RoomType = TestRoom
 		count = 5:10
@@ -54,10 +58,8 @@ Area Tower {
 	}
 }
 Area Ground {
-	Prob 1 = 4
-	Type 1 = Earth
-	Prob 2 = 5
-	Type 2 = Stone
+	Type = Earth
+	Modifier Stone
 	SubArea {
 		RoomType = TestRoom
 		count = 5:15

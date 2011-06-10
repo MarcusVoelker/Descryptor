@@ -12,6 +12,10 @@ public class ExceptionLogger {
 				System.err.println(logLevel+": "+e1.getMessage());
 			}
 		} catch (Throwable e1) {
+			if (logLevel == LoggerLevel.CRITICAL)
+			{
+				e.printStackTrace();
+			}
 			if (level.getValue() >= logLevel.getValue())
 			{
 				System.err.println(logLevel+": "+e1.getMessage());

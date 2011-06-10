@@ -1,25 +1,24 @@
 package jworldgen.generator.worldStructure;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.InvalidRangeExpression;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.RecursionException;
-import jworldgen.generator.PerlinGenerator;
 import jworldgen.generator.RNG;
 import jworldgen.generator.World;
+import jworldgen.parser.parseStructure.ParseModifier;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
 public class TreeNodeArea {
 	private ArrayList<ParseSubArea> parseSubAreas;
-	private Hashtable<Integer,Integer> probabilities;	
-	private Hashtable<Integer,Integer> tileIDs;
+	private Integer tileID;
+	private ArrayList<String> parseModifiers;
 	
 	private ArrayList<TreeNodeArea> subAreas;
+	private ArrayList<Modifier> modifiers;
 	
 	protected String identifier;
 	
@@ -36,31 +35,24 @@ public class TreeNodeArea {
 	
 	protected boolean isStamp = false;
 	
-	private int probSum;
-	
 	public TreeNodeArea()
 	{
 		subAreas = new ArrayList<TreeNodeArea>();
+		modifiers = new ArrayList<Modifier>();
 	}
 	
-	public TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> tileIDs, String identifier)
+	public TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, String identifier, ArrayList<String> parseModifiers)
 	{
 		this();
 		this.parseSubAreas = parseSubAreas;
-		this.probabilities = probabilities;
-		this.tileIDs = tileIDs;
+		this.tileID = tileID;
 		this.identifier = identifier;
-		probSum = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			Integer key = e.nextElement();
-			probSum += probabilities.get(key);
-		}
+		this.parseModifiers = parseModifiers;
 	}
 	
-	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> tileIDs, ArrayList<TreeNodeArea> subAreas,String identifier)
+	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, ArrayList<TreeNodeArea> subAreas,String identifier, ArrayList<String> parseModifiers)
 	{
-		this(parseSubAreas,probabilities,tileIDs,identifier);
+		this(parseSubAreas,tileID,identifier,parseModifiers);
 		this.subAreas = subAreas;
 	}
 	
@@ -118,7 +110,16 @@ public class TreeNodeArea {
 		}
 		return result;
 	}
-
+	
+	public ArrayList<String> getModifierNames()
+	{
+		ArrayList<String> result = new ArrayList<String>();
+		for (String mod: parseModifiers)
+		{
+			result.add(mod);
+		}
+		return result;
+	}
 	
 	public void addSubArea(TreeNodeArea area) throws CriticalFailure
 	{
@@ -150,6 +151,7 @@ public class TreeNodeArea {
 	{
 		return identifier;
 	}
+	
 	public void addRoom(TreeNodeRoom room) throws CriticalFailure
 	{
 		subAreas.add(room);
@@ -171,9 +173,14 @@ public class TreeNodeArea {
 		}
 	}
 	
+	public void addModifier(Modifier mod) throws CriticalFailure
+	{
+		modifiers.add(mod);
+	}
+	
 	public TreeNodeArea clone()
 	{
-		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, probabilities, tileIDs, subAreas, identifier);
+		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, parseModifiers);
 		try {
 			newArea.setCount(countLow, countHigh);
 			newArea.setHeight(heightLow, heightHigh);
@@ -236,29 +243,31 @@ public class TreeNodeArea {
 		subAreas = realSubAreas;
 	}
 	
-	protected int getNextTileId(int x, int y, PerlinGenerator perlin)
+	private void determineValue(RNG rng, World world, int x, int y, int z)
 	{
-		float perlinValue = (float)perlin.noise(x, y, 1,16);
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
+		world.setValue(x, y, tileID);
+		for (Modifier mod : modifiers)
 		{
-			int curElement = e.nextElement();
-			perlinValue -= ((float) probabilities.get(curElement))/probSum;
-			if (perlinValue < 0)
-				return tileIDs.get(curElement);
+			int value = mod.getValue(x, y, 0);
+			if (value != 0)
+			{
+				world.setValue(x, y, value);
+			}
 		}
-		return 0;		
 	}
-	
-	public void fillWorld(RNG rng, World world, int gridSize)
+	public void fillWorld(RNG rng, World world)
 	{
-		PerlinGenerator perlin = new PerlinGenerator(rng,Math.max(world.getHeight()/gridSize,world.getWidth()/gridSize));
+		for (Modifier mod : modifiers)
+		{
+			mod.setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
+		}
 		if (isStamp)
 		{
 			for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor(xPosLow*world.getWidth()+widthLow); x++)
 			{
 				for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor(yPosLow*world.getHeight()+heightLow); y++)
-				{
-					world.setValue(x, y, getNextTileId(x,y,perlin));
+				{			
+					determineValue(rng,world,x,y,0);
 				}
 			}
 			return;
@@ -267,13 +276,13 @@ public class TreeNodeArea {
 		{
 			for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor((yPosLow+heightLow)*world.getHeight()); y++)
 			{
-				world.setValue(x, y, getNextTileId(x,y,perlin));
+				determineValue(rng,world,x,y,0);
 			}
 		}
 		
 		for (TreeNodeArea tna: subAreas)
 		{
-			tna.fillWorld(rng, world,gridSize);
+			tna.fillWorld(rng, world);
 		}
 	}
 	

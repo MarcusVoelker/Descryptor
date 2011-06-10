@@ -24,7 +24,8 @@ public class RuleParser{  public static ParseList parse(String ruleCode) throw
   "*/": DEFAULT
 }
 TOKEN : /* Partitions */{  < ROOM : "Room" >| < AREA : "Area" >| < SUBAREA : "SubArea" >
-| < STAMP : "Stamp" >}
+| < STAMP : "Stamp" >
+| < MODIFIER : "Modifier" >}
 
 TOKEN : /* Room Keys */
 {
@@ -34,7 +35,7 @@ TOKEN : /* Room Keys */
 | < BG : "Background" >
 }
 
-TOKEN : /* Area Keys */
+TOKEN : /* Modifier and Area Keys */
 {
   < PROB : "Prob" >
 | < TYPE : "Type" >
@@ -59,7 +60,7 @@ ParseList parseRoot():
 {	partition(list)
 	{
 	  return list;	}
-}void partition(ParseList list) :{ParseRoom room; ParseArea area;}{  room = room() partition(list)
+}void partition(ParseList list) :{ParseRoom room; ParseArea area; ParseModifier modifier;}{  room = room() partition(list)
   {
     list.addRoom(room);
   }
@@ -67,6 +68,10 @@ ParseList parseRoot():
 | area = area() partition(list)
   {
     list.addArea(area);
+  }
+| modifier = modifier() partition(list)
+  {
+    list.addModifier(modifier);
   }
 | < EOF >}
 
@@ -91,15 +96,27 @@ void roomLine(ParseRoom room) :
 }
 
 void areaLine(ParseArea area) :
-{Token probType; int id;}
+{Token probType; Token modType;}
 {
-  id = prob() "=" probType = < CONSTANT >
+  < TYPE > "=" probType = < IDENT >
   {
-    area.addProbability(Integer.parseInt(probType.image),id);  }
-|
-  id = type() "=" probType = < IDENT >
+    area.setType(probType.image);
+  }
+| < MODIFIER > modType = < IDENT >
+  {	area.addModifier(modType.image);
+  }  
+}
+
+void modifierLine(ParseModifier modifier) :
+{Token probType; Token id;}
+{
+  < TYPE > id = < CONSTANT > "=" probType = < IDENT >
   {
-    area.addType(probType.image,id);
+    modifier.addType(probType.image, Integer.parseInt(id.image));
+  }
+| < PROB > id = < CONSTANT > "=" probType = < CONSTANT >
+  {
+    modifier.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
   }
 }
 
@@ -209,6 +226,16 @@ ParseArea area():
 {  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area) | stamp(area))* "}"
   {
     area.setIdentifier(ident.image);	return area;
+  }
+}
+
+ParseModifier modifier():
+{ParseModifier modifier = new ParseModifier(); Token ident;}
+{
+  < MODIFIER > ident = < IDENT > "{" (modifierLine(modifier))* "}"
+  {
+    modifier.setIdentifier(ident.image);
+	return modifier;
   }
 }
 

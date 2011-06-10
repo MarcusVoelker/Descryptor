@@ -23,7 +23,7 @@ public class Generator {
 		this.randomNumberGenerator = new RNG();
 		TreeNodeArea world = rules.getWorld();
 		World blockWorld = new World(width,height);
-		world.fillWorld(randomNumberGenerator,blockWorld,1);
+		world.fillWorld(randomNumberGenerator,blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}
@@ -33,7 +33,7 @@ public class Generator {
 		this.randomNumberGenerator = new RNG(seed);
 		TreeNodeArea world = rules.getWorld();
 		World blockWorld = new World(width,height);
-		world.fillWorld(randomNumberGenerator,blockWorld,1);
+		world.fillWorld(randomNumberGenerator,blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}

@@ -39,7 +39,7 @@ public class TreeNodeRoom extends TreeNodeArea{
 		return tnr;
 	}
 	
-	public void fillWorld(RNG rng, World world, int gridSize)
+	public void fillWorld(RNG rng, World world)
 	{
 		int left;
 		int right;

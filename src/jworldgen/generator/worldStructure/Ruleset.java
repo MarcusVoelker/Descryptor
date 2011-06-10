@@ -30,10 +30,25 @@ public class Ruleset
 		list.insertBlockIDs(blockMap);
 		Hashtable<String,TreeNodeRoom> rooms = list.createRoomNodes();
 		Hashtable<String,TreeNodeArea> areas = list.createAreaNodes();
+		Hashtable<String,Modifier> modifiers = list.createModifiers();
 		for (Enumeration<String> e = areas.keys(); e.hasMoreElements();)
 		{
 			String areaName = e.nextElement();
 			ExceptionLogger.log("Parsing Area \""+areaName+"\"", LoggerLevel.FINE);
+			ArrayList<String> modNames = areas.get(areaName).getModifierNames();
+			for (String name : modNames)
+			{
+				Modifier mod = modifiers.get(name);
+				if (mod != null)
+				{
+					ExceptionLogger.log("Adding Modifier \""+name+"\"", LoggerLevel.FINEST);
+					areas.get(areaName).addModifier(mod.clone());
+				}
+				else
+				{
+					ExceptionLogger.logException(new UnknownIdentifier(name), LoggerLevel.ERROR);
+				}
+			}
 			ArrayList<String> subNames = areas.get(areaName).getSubAreaNames();
 			for (String name : subNames)
 			{

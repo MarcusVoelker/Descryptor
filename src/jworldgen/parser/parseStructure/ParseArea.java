@@ -1,24 +1,21 @@
 package jworldgen.parser.parseStructure;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 import jworldgen.generator.worldStructure.TreeNodeArea;
 
 public class ParseArea {
 	private ArrayList<ParseSubArea> subAreas;
-	private Hashtable<Integer,Integer> probabilities;
-	private Hashtable<Integer,String> tileTypes;
+	private String tileType;
 	private String identifier;
+	private ArrayList<String> modifiers;
 	
-	private Hashtable<Integer,Integer> tileIDs;
+	private Integer tileID;
 	
 	public ParseArea()
 	{
 		this.subAreas = new ArrayList<ParseSubArea>();
-		this.probabilities = new Hashtable<Integer,Integer>();
-		this.tileTypes = new Hashtable<Integer,String>();
+		this.modifiers = new ArrayList<String>();
 	}
 	
 	public void addSubArea(ParseSubArea area)
@@ -26,14 +23,9 @@ public class ParseArea {
 		subAreas.add(area);
 	}
 	
-	public void addProbability(Integer prob, int id)
+	public void setType(String tileType)
 	{
-		probabilities.put(id, prob);
-	}
-	
-	public void addType(String tileType, int id)
-	{
-		tileTypes.put(id, tileType);
+		this.tileType = tileType;
 	}
 	
 	public void setIdentifier (String identifier)
@@ -46,20 +38,18 @@ public class ParseArea {
 		return identifier;
 	}
 	
-	public void insertBlockIDs(BlockMap blockmap)
+	public void insertBlockID(BlockMap blockmap)
 	{
-		tileIDs = new Hashtable<Integer,Integer>();
-		for (Enumeration<Integer> e = tileTypes.keys(); e.hasMoreElements();)
-		{
-			Integer hashKey = e.nextElement();
-			String blockType = tileTypes.get( hashKey );
-			Integer id = blockmap.registerBlock(blockType);
-			tileIDs.put(hashKey, id);
-		}
+		tileID = blockmap.registerBlock(tileType);
+	}
+	
+	public void addModifier(String modName)
+	{
+		modifiers.add(modName);
 	}
 	
 	public TreeNodeArea toAreaNode()
 	{
-		return new TreeNodeArea(subAreas,probabilities,tileIDs,identifier);
+		return new TreeNodeArea(subAreas,tileID,identifier,modifiers);
 	}
 }
