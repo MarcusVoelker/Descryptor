@@ -1,6 +1,7 @@
 package jworldgen.parser.parseStructure;
 
 import jworldgen.generator.RNG;
+import jworldgen.generator.VariableResolver;
 
 public class ALEQueueElement {
 	public String identifier;
@@ -12,14 +13,16 @@ public class ALEQueueElement {
 		this.type = type;
 	}
 	
-	public Number toValue(ALEElementType resultType, RNG rng)
+	public Number toValue(RNG rng, VariableResolver resolver)
 	{
-		switch (resultType)
+		switch (type)
 		{
 			case INTEGER:
 				return Integer.parseInt(identifier);
 			case FLOAT:
 				return Float.parseFloat(identifier);
+			case VARIABLE:
+				return resolver.getVariable(identifier);
 		}
 		return null;
 	}
@@ -59,15 +62,13 @@ public class ALEQueueElement {
 		}
 		return null;
 	}
-	public Number toValue(Number v1, Number v2, ALEElementType resultType, RNG rng)
+	public Number toValue(Number v1, Number v2, RNG rng)
 	{
-		switch (resultType)
+		if ((v1 instanceof Integer) && (v2 instanceof Integer))
 		{
-			case INTEGER:
 				return toInt((Integer) v1,(Integer) v2, rng);
-			case FLOAT:
+		} else {
 				return toFloat((Float) v1,(Float) v2, rng);
 		}
-		return null;
 	}
 }

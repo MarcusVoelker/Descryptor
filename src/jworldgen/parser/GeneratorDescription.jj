@@ -308,11 +308,18 @@ int type():
 		return Integer.parseInt(id.image);
 	}}
 
+ParseAssignment assignment():
+{Token t; ParseALE ale;}
+{
+  t = < IDENT > "=" ale = ale()
+  {
+    return new ParseAssignment(t.image,ale);
+  }}
 ParseALE ale():
 {PriorityQueue<ALEQueueElement> output = new PriorityQueue(); Stack opStack = new Stack();}
 {
   aleShunt(output,opStack)
-  {    return new ParseALE(output, ALEElementType.INTEGER);
+  {    return new ParseALE(output);
   }}
 
 void aleShunt(PriorityQueue<ALEQueueElement>  output, Stack opStack):
