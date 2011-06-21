@@ -9,7 +9,6 @@ import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
 import jworldgen.generator.World;
-import jworldgen.parser.parseStructure.ParseModifier;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
 public class TreeNodeArea {
@@ -50,10 +49,11 @@ public class TreeNodeArea {
 		this.parseModifiers = parseModifiers;
 	}
 	
-	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, ArrayList<TreeNodeArea> subAreas,String identifier, ArrayList<String> parseModifiers)
+	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, ArrayList<TreeNodeArea> subAreas,String identifier, ArrayList<Modifier> modifiers)
 	{
-		this(parseSubAreas,tileID,identifier,parseModifiers);
+		this(parseSubAreas,tileID,identifier,null);
 		this.subAreas = subAreas;
+		this.modifiers = modifiers;
 	}
 	
 	public void setCount(int low, int high) throws CriticalFailure
@@ -180,7 +180,7 @@ public class TreeNodeArea {
 	
 	public TreeNodeArea clone()
 	{
-		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, parseModifiers);
+		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, modifiers);
 		try {
 			newArea.setCount(countLow, countHigh);
 			newArea.setHeight(heightLow, heightHigh);
@@ -245,7 +245,8 @@ public class TreeNodeArea {
 	
 	private void determineValue(RNG rng, World world, int x, int y, int z)
 	{
-		world.setValue(x, y, tileID);
+		if (tileID != 0)
+			world.setValue(x, y, tileID);
 		for (Modifier mod : modifiers)
 		{
 			int value = mod.getValue(x, y, 0);

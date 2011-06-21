@@ -16,10 +16,30 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 public class TestStartup {
+	private static void setColor(int hue, float sat, float val, int max)
+	{
+		int h = 6*hue/max;
+		float f = 6*(float) hue/max - h;
+		float p = val*(1-sat);
+		float q = val*(1-sat*f);
+		float t = val*(1-sat*(1-f));
+		if (h == 0 || h == 6)
+			GL11.glColor3f(val,t,p);
+		if (h == 1)
+			GL11.glColor3f(q,val,p);
+		if (h == 2)
+			GL11.glColor3f(p,val,t);
+		if (h == 3)
+			GL11.glColor3f(p,q,val);
+		if (h == 4)
+			GL11.glColor3f(t,p,val);
+		if (h == 5)
+			GL11.glColor3f(val,p,q);
+	}
 	public static void main(String[] args)
 	{
 		try {
-			World world = Generator.generateFromFile("data/TestRules.txt", 100, 100);
+			World world = Generator.generateFromFile("data/TestRules.txt", 500, 500);
 			Display.setDisplayMode(new DisplayMode(500,500));
 			Display.create();
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -38,7 +58,7 @@ public class TestStartup {
 					for (int j = 0; j < world.getHeight(); j++)
 					{
 						int color = world.getValue(i, j);
-						GL11.glColor3f(color/6.0f,color/6.0f,color/6.0f);
+						setColor(color,0.5f,color/10.0f,10);
 						
 						// draw quad
 						GL11.glBegin(GL11.GL_QUADS);

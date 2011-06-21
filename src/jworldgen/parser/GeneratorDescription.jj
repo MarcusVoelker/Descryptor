@@ -3,6 +3,8 @@
  */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(RuleParser)package jworldgen.parser;
 
 import java.io.StringReader;
+import java.util.Stack;
+import java.util.PriorityQueue;
 import jworldgen.parser.parseStructure.*;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
@@ -51,9 +53,17 @@ TOKEN : /* SubArea Keys */
 | < HEIGHT : "height" >
 | < COUNT : "count" >
 }
-TOKEN : /* Misc Identifiers */{  < CONSTANT : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
+
+TOKEN: /* ALE Operators */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTIPLY : "*" >
+| < DIVIDE : "/" >
+| < RANDOM : ":" >}TOKEN : /* Misc Identifiers */{  < INTEGER : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
 | < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
-| < FLOAT : < CONSTANT > "." < CONSTANT > >}
+| < FLOAT : < INTEGER > "." < INTEGER > >
+| < EOL : ";" >}
 
 ParseList parseRoot():
 {ParseList list = new ParseList();}
@@ -110,11 +120,11 @@ void areaLine(ParseArea area) :
 void modifierLine(ParseModifier modifier) :
 {Token probType; Token id;}
 {
-  < TYPE > id = < CONSTANT > "=" probType = < IDENT >
+  < TYPE > id = < INTEGER > "=" probType = < IDENT >
   {
     modifier.addType(probType.image, Integer.parseInt(id.image));
   }
-| < PROB > id = < CONSTANT > "=" probType = < CONSTANT >
+| < PROB > id = < INTEGER > "=" probType = < INTEGER >
   {
     modifier.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
   }
@@ -247,7 +257,7 @@ int[] combExp():
 }
 
 int intValExp():
-{Token t;}{	t = < CONSTANT >
+{Token t;}{	t = < INTEGER >
 	{		return Integer.parseInt(t.image);
 	}
 |   t = "$n"
@@ -286,14 +296,91 @@ float[] probExp():
 
 int prob():
 {Token id;}
-{	< PROB > id = < CONSTANT >
+{	< PROB > id = < INTEGER >
 	{		return Integer.parseInt(id.image);
 	}	
 }
 
 int type():
 {Token id;}{
-  < TYPE > id = < CONSTANT >
+  < TYPE > id = < INTEGER >
 	{
 		return Integer.parseInt(id.image);
-	}}  
+	}}
+
+ParseALE ale():
+{PriorityQueue<ALEQueueElement> output = new PriorityQueue(); Stack opStack = new Stack();}
+{
+  aleShunt(output,opStack)
+  {    return new ParseALE(output, ALEElementType.INTEGER);
+  }}
+
+void aleShunt(PriorityQueue<ALEQueueElement>  output, Stack opStack):
+{}
+{
+ 	aleBracket(output,opStack) | aleOperator(output,opStack) | aleLeaf(output) | < EOL > }
+
+void aleBracket(PriorityQueue<ALEQueueElement>  output, Stack opStack):
+{Token t;}
+{
+	t = "("
+	{
+		opStack.push(t.image);
+	}
+|   t = ")"
+	{
+		while (!opStack.peek().equals("("))
+		{
+			output.add((ALEQueueElement) opStack.pop());
+		}
+		opStack.pop();
+	}
+}
+
+void aleOperator(PriorityQueue<ALEQueueElement> output, Stack opStack):
+{Token t; ALEElementType type;}
+{	(
+	  t = < PLUS > { type = ALEElementType.PLUS; }
+	|
+	  t = < MINUS > { type = ALEElementType.MINUS; }
+	)
+	{		while (!opStack.empty())
+		{
+		  output.add((ALEQueueElement) opStack.pop());		}
+		opStack.push(new ALEQueueElement(t.image,type));
+	}
+
+|   (
+	  t = < MULTIPLY > { type = ALEElementType.MULTIPLY; }
+	|
+	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
+	)
+	{		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
+		{			output.add((ALEQueueElement) opStack.pop());
+		}
+		opStack.push(new ALEQueueElement(t.image,type));
+	}
+|   t = < RANDOM >
+	{
+		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.RANDOM)
+		{
+			output.add((ALEQueueElement) opStack.pop());
+		}
+		opStack.push(new ALEQueueElement(t.image,ALEElementType.RANDOM));
+	}
+}
+
+void aleLeaf(PriorityQueue<ALEQueueElement> output):
+{Token t; ALEElementType type;}
+{
+  	(
+  	  t = < FLOAT > { type = ALEElementType.FLOAT; }
+  	|
+  	  t = < IDENT > { type = ALEElementType.VARIABLE; }
+  	|
+  	  t = < INTEGER > { type = ALEElementType.INTEGER; }
+  	)
+  	{
+  	  output.add(new ALEQueueElement(t.image,type));  	}
+}
+  

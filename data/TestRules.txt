@@ -7,9 +7,25 @@ Room TestRoom {
 
 Modifier Stone {
 	Prob 1 = 1
-	Type 1 = None
+	Type 1 = Stone
 	Prob 2 = 1
-	Type 2 = Stone	
+	Type 2 = None	
+	Prob 3 = 1
+	Type 3 = CrackedStone
+}
+
+Modifier Iron {
+	Prob 1 = 2
+	Type 1 = None	
+	Prob 2 = 1
+	Type 2 = Iron
+}
+
+Modifier Gold {
+	Prob 1 = 5
+	Type 1 = None	
+	Prob 2 = 2
+	Type 2 = Gold
 }
 
 Area World {
@@ -60,6 +76,15 @@ Area Tower {
 Area Ground {
 	Type = Earth
 	Modifier Stone
+	Modifier Iron
+	SubArea {
+		AreaType = GoldenGround
+		count = 1:1
+		xPos = 0.0:0.0
+		yPos = 0.8:0.8
+		width = 1.0:1.0
+		height = 0.2:0.2
+	}/*
 	SubArea {
 		RoomType = TestRoom
 		count = 5:15
@@ -75,5 +100,9 @@ Area Ground {
 		yPos = 0.0:0.4
 		width = 5:15
 		height = 4:4
-	}
+	}*/
+}
+Area GoldenGround {
+	Type = None
+	Modifier Gold
 }
