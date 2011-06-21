@@ -1,14 +1,8 @@
 package jworldgen.test;
 
 import jworldgen.exceptionHandler.CriticalFailure;
-import jworldgen.filehandler.TextFileReader;
 import jworldgen.generator.Generator;
-import jworldgen.generator.RNG;
 import jworldgen.generator.World;
-import jworldgen.generator.worldStructure.Ruleset;
-import jworldgen.parser.ParseException;
-import jworldgen.parser.RuleParser;
-import jworldgen.parser.parseStructure.ParseList;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -16,6 +10,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 public class TestStartup {
+	
 	private static void setColor(int hue, float sat, float val, int max)
 	{
 		int h = 6*hue/max;
@@ -36,6 +31,7 @@ public class TestStartup {
 		if (h == 5)
 			GL11.glColor3f(val,p,q);
 	}
+	
 	public static void main(String[] args)
 	{
 		try {

@@ -1,6 +1,5 @@
 package jworldgen.test;
 
-import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.generator.PerlinGenerator;
 import jworldgen.generator.RNG;
 

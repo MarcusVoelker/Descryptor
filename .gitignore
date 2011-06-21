@@ -1,0 +1,16 @@
+#
+# ignore automaticly generated files
+#
+.classpath
+.project
+.settings*
+
+#
+# temp files
+#
+*~
+
+#
+# ignore MacOS X folder info files
+#
+*.DS_Store
