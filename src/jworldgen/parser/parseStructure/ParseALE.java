@@ -1,15 +1,15 @@
 package jworldgen.parser.parseStructure;
 
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 import java.util.Stack;
 
 import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 
 public class ParseALE {
-	private PriorityQueue<ALEQueueElement> postfix;
+	private LinkedList<ALEQueueElement> postfix;
 	
-	public ParseALE(PriorityQueue<ALEQueueElement> postfix)
+	public ParseALE(LinkedList<ALEQueueElement> postfix)
 	{
 		this.postfix = postfix;
 	}
@@ -35,5 +35,14 @@ public class ParseALE {
 		return evaluation.pop();
 	}
 	
+	public String toString()
+	{
+		String result = "";
+		for (ALEQueueElement aqe : postfix)
+		{
+			result += aqe.identifier + " ";
+		}
+		return result;
+	}
 	
 }

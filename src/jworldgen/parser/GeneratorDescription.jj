@@ -4,7 +4,7 @@
 
 import java.io.StringReader;
 import java.util.Stack;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
 import jworldgen.parser.parseStructure.*;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
@@ -47,11 +47,6 @@ TOKEN : /* SubArea Keys */
 {
   < ATYPE : "AreaType" >
 | < RTYPE : "RoomType" >
-| < XPOS : "xPos" >
-| < YPOS : "yPos" >
-| < WIDTH : "width" >
-| < HEIGHT : "height" >
-| < COUNT : "count" >
 }
 
 TOKEN: /* ALE Operators */
@@ -131,7 +126,7 @@ void modifierLine(ParseModifier modifier) :
 }
 
 void subAreaLine(ParseSubArea subArea) :
-{Token identifier; int[] ints; float[] floats;}
+{Token identifier; int[] ints; float[] floats; ParseAssignment assignment;}
 {
   < ATYPE > "=" identifier = < IDENT >
   {
@@ -140,35 +135,14 @@ void subAreaLine(ParseSubArea subArea) :
   {
     subArea.areaType = identifier.image;
   }
-| < COUNT > "=" ints = combExp()
+| assignment = assignment()
   {
-    subArea.countLow = ints[0];
-    subArea.countHigh = ints[1];
-  }
-| < XPOS > "=" floats = probExp()
-  {
-    subArea.xPosLow = floats[0];
-    subArea.xPosHigh = floats[1];
-  }
-| < YPOS > "=" floats = probExp()
-  {
-    subArea.yPosLow = floats[0];
-    subArea.yPosHigh = floats[1];
-  }
-| < WIDTH > "=" floats = probExp()
-  {
-    subArea.widthLow = floats[0];
-    subArea.widthHigh = floats[1];
-  }
-| < HEIGHT > "=" floats = probExp()
-  {
-    subArea.heightLow = floats[0];
-    subArea.heightHigh = floats[1];
+    subArea.assignments.add(assignment);
   }
 }
 
 void stampLine(ParseSubArea subArea) :
-{Token identifier; int[] ints; float[] floats;}
+{Token identifier; int[] ints; float[] floats; ParseAssignment assignment;}
 {
   < ATYPE > "=" identifier = < IDENT >
   {
@@ -178,30 +152,9 @@ void stampLine(ParseSubArea subArea) :
   {
     subArea.areaType = identifier.image;
   }
-| < COUNT > "=" ints = combExp()
+| assignment = assignment()
   {
-    subArea.countLow = ints[0];
-    subArea.countHigh = ints[1];
-  }
-| < XPOS > "=" floats = probExp()
-  {
-    subArea.xPosLow = floats[0];
-    subArea.xPosHigh = floats[1];
-  }
-| < YPOS > "=" floats = probExp()
-  {
-    subArea.yPosLow = floats[0];
-    subArea.yPosHigh = floats[1];
-  }
-| < WIDTH > "=" ints = combExp()
-  {
-    subArea.widthLow = ints[0];
-    subArea.widthHigh = ints[1];
-  }
-| < HEIGHT > "=" ints = combExp()
-  {
-    subArea.heightLow = ints[0];
-    subArea.heightHigh = ints[1];
+    subArea.assignments.add(assignment);
   }
 }
 
@@ -316,18 +269,21 @@ ParseAssignment assignment():
     return new ParseAssignment(t.image,ale);
   }}
 ParseALE ale():
-{PriorityQueue<ALEQueueElement> output = new PriorityQueue(); Stack opStack = new Stack();}
+{LinkedList<ALEQueueElement> output = new LinkedList(); Stack opStack = new Stack();}
 {
   aleShunt(output,opStack)
-  {    return new ParseALE(output);
+  {
+    while (!opStack.empty())
+    {		output.add((ALEQueueElement) opStack.pop());
+    }    return new ParseALE(output);
   }}
 
-void aleShunt(PriorityQueue<ALEQueueElement>  output, Stack opStack):
+void aleShunt(LinkedList<ALEQueueElement>  output, Stack opStack):
 {}
 {
- 	aleBracket(output,opStack) | aleOperator(output,opStack) | aleLeaf(output) | < EOL > }
+ 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleLeaf(output))* < EOL > }
 
-void aleBracket(PriorityQueue<ALEQueueElement>  output, Stack opStack):
+void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 {Token t;}
 {
 	t = "("
@@ -344,7 +300,7 @@ void aleBracket(PriorityQueue<ALEQueueElement>  output, Stack opStack):
 	}
 }
 
-void aleOperator(PriorityQueue<ALEQueueElement> output, Stack opStack):
+void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 {Token t; ALEElementType type;}
 {	(
 	  t = < PLUS > { type = ALEElementType.PLUS; }
@@ -377,7 +333,7 @@ void aleOperator(PriorityQueue<ALEQueueElement> output, Stack opStack):
 	}
 }
 
-void aleLeaf(PriorityQueue<ALEQueueElement> output):
+void aleLeaf(LinkedList<ALEQueueElement> output):
 {Token t; ALEElementType type;}
 {
   	(

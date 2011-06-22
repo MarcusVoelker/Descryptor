@@ -83,11 +83,7 @@ public class Ruleset
 		}
 		else
 		{
-			world.setCount(1, 1);
-			world.setHeight(1, 1);
-			world.setWidth(1, 1);
-			world.setXPos(0, 0);
-			world.setYPos(0, 0);
+			world.setAsRootNode();
 		}
 	}
 	

@@ -4,11 +4,12 @@ import java.util.ArrayList;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
-import jworldgen.exceptionHandler.InvalidRangeExpression;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
+import jworldgen.generator.VariableResolver;
 import jworldgen.generator.World;
+import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
 public class TreeNodeArea {
@@ -19,18 +20,14 @@ public class TreeNodeArea {
 	private ArrayList<TreeNodeArea> subAreas;
 	private ArrayList<Modifier> modifiers;
 	
+	protected float xPos;
+	protected float yPos;
+	protected float width;
+	protected float height;
+	
 	protected String identifier;
 	
-	protected int countLow;
-	protected int countHigh;
-	protected float xPosLow;
-	protected float xPosHigh;
-	protected float yPosLow;
-	protected float yPosHigh;
-	protected float widthLow;
-	protected float widthHigh;
-	protected float heightLow;
-	protected float heightHigh;
+	protected ArrayList<ParseAssignment> assignments;
 	
 	protected boolean isStamp = false;
 	
@@ -54,46 +51,6 @@ public class TreeNodeArea {
 		this(parseSubAreas,tileID,identifier,null);
 		this.subAreas = subAreas;
 		this.modifiers = modifiers;
-	}
-	
-	public void setCount(int low, int high) throws CriticalFailure
-	{
-		if (low > high)
-			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
-		this.countLow = low;
-		this.countHigh = high;
-	}
-	
-	public void setXPos(float low, float high) throws CriticalFailure
-	{
-		if (low > high)
-			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
-		this.xPosLow = low;
-		this.xPosHigh = high;
-	}
-	
-	public void setYPos(float low, float high) throws CriticalFailure
-	{
-		if (low > high)
-			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
-		this.yPosLow = low;
-		this.yPosHigh = high;
-	}
-	
-	public void setWidth(float low, float high) throws CriticalFailure
-	{
-		if (low > high)
-			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
-		this.widthLow = low;
-		this.widthHigh = high;
-	}
-	
-	public void setHeight(float low, float high) throws CriticalFailure
-	{
-		if (low > high)
-			ExceptionLogger.logException(new InvalidRangeExpression(), LoggerLevel.CRITICAL);
-		this.heightLow = low;
-		this.heightHigh = high;
 	}
 	
 	public void makeStamp()
@@ -121,6 +78,10 @@ public class TreeNodeArea {
 		return result;
 	}
 	
+	public void setAssignments(ArrayList<ParseAssignment> assignments)
+	{
+		this.assignments = assignments;
+	}
 	public void addSubArea(TreeNodeArea area) throws CriticalFailure
 	{
 		subAreas.add(area);
@@ -134,13 +95,7 @@ public class TreeNodeArea {
 		{
 			if (parseSubArea.areaType.equals(areaName))
 			{
-				if (parseSubArea.countLow == 0 && parseSubArea.countHigh == 0)
-					ExceptionLogger.log("Count of SubArea \""+ areaName +"\" in Area \""+identifier+"\" is always zero!", LoggerLevel.WARNING);
-				area.setCount(parseSubArea.countLow,parseSubArea.countHigh);
-				area.setXPos(parseSubArea.xPosLow,parseSubArea.xPosHigh);
-				area.setYPos(parseSubArea.yPosLow,parseSubArea.yPosHigh);
-				area.setWidth(parseSubArea.widthLow,parseSubArea.widthHigh);
-				area.setHeight(parseSubArea.heightLow,parseSubArea.heightHigh);
+				area.setAssignments(parseSubArea.assignments);
 				if (parseSubArea.isStamp)
 					area.makeStamp();
 			}
@@ -160,11 +115,7 @@ public class TreeNodeArea {
 		{
 			if (parseSubArea.areaType.equals(roomName))
 			{
-				room.setCount(parseSubArea.countLow,parseSubArea.countHigh);
-				room.setXPos(parseSubArea.xPosLow,parseSubArea.xPosHigh);
-				room.setYPos(parseSubArea.yPosLow,parseSubArea.yPosHigh);
-				room.setWidth(parseSubArea.widthLow,parseSubArea.widthHigh);
-				room.setHeight(parseSubArea.heightLow,parseSubArea.heightHigh);
+				room.setAssignments(parseSubArea.assignments);
 				if (parseSubArea.isStamp)
 					room.makeStamp();
 				parseSubAreas.remove(parseSubArea);
@@ -181,16 +132,7 @@ public class TreeNodeArea {
 	public TreeNodeArea clone()
 	{
 		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, modifiers);
-		try {
-			newArea.setCount(countLow, countHigh);
-			newArea.setHeight(heightLow, heightHigh);
-			newArea.setWidth(widthLow, widthHigh);
-			newArea.setXPos(xPosLow, xPosHigh);
-			newArea.setYPos(yPosLow, yPosHigh);
-		} catch (CriticalFailure e) {
-			// This block should never be reached.
-			e.printStackTrace();
-		}
+		newArea.setAssignments(assignments);
 		if (isStamp)
 			newArea.makeStamp();
 		return newArea;
@@ -198,7 +140,16 @@ public class TreeNodeArea {
 	
 	protected  int calculateCount(RNG rng)
 	{
-		return rng.nextInt(countLow, countHigh);
+		//TODO: Calculate it!
+		return 1;
+	}
+	
+	public void setAsRootNode()
+	{
+		xPos = 0;
+		yPos = 0;
+		width = 1;
+		height = 1;
 	}
 	
 	protected float resolveSymbolicValue(float symbol, int index, int subCount)
@@ -221,12 +172,20 @@ public class TreeNodeArea {
 	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
 	{
 		ExceptionLogger.log("Expanding Area \""+identifier+"\"", LoggerLevel.FINEST);
-		xPosLow = calculateFloat(rng,xPosLow,xPosHigh,index,subCount)*parentWidth+parentXPos;
-		yPosLow = calculateFloat(rng,yPosLow,yPosHigh,index,subCount)*parentHeight+parentYPos;
-		if (!isStamp)
+		VariableResolver resolver = new VariableResolver();
+		if (assignments != null)
 		{
-			widthLow = calculateFloat(rng,widthLow,widthHigh,index,subCount)*parentWidth;
-			heightLow = calculateFloat(rng,heightLow,heightHigh,index,subCount)*parentHeight;
+			for (ParseAssignment assignment : assignments)
+			{
+				assignment.evaluate(rng, resolver);
+			}
+			xPos = ((Float) resolver.getVariable("xPos"))*parentWidth+parentXPos;
+			yPos = ((Float) resolver.getVariable("yPos"))*parentHeight+parentYPos;
+			if (!isStamp)
+			{
+				width = ((Float) resolver.getVariable("width"))*parentWidth+parentXPos;
+				height = ((Float) resolver.getVariable("height"))*parentHeight+parentYPos;
+			}
 		}
 		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
 		
@@ -236,7 +195,7 @@ public class TreeNodeArea {
 			for (int i = 0; i < newSubCount; i++)
 			{
 				TreeNodeArea newArea = tna.clone();
-				newArea.expandToWorldTree(rng, heightLow, widthLow, xPosLow, yPosLow, i, newSubCount);
+				newArea.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
 				realSubAreas.add(newArea);
 			}
 		}
@@ -264,18 +223,18 @@ public class TreeNodeArea {
 		}
 		if (isStamp)
 		{
-			for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor(xPosLow*world.getWidth()+widthLow); x++)
+			for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor(xPos*world.getWidth()+width); x++)
 			{
-				for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor(yPosLow*world.getHeight()+heightLow); y++)
+				for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor(yPos*world.getHeight()+height); y++)
 				{			
 					determineValue(rng,world,x,y,0);
 				}
 			}
 			return;
 		}
-		for (int x = (int) Math.floor(xPosLow*world.getWidth()); x < (int) Math.floor((xPosLow+widthLow)*world.getWidth()); x++)
+		for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor((xPos+width)*world.getWidth()); x++)
 		{
-			for (int y = (int) Math.floor(yPosLow*world.getHeight()); y < (int) Math.floor((yPosLow+heightLow)*world.getHeight()); y++)
+			for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor((yPos+height)*world.getHeight()); y++)
 			{
 				determineValue(rng,world,x,y,0);
 			}
@@ -294,6 +253,6 @@ public class TreeNodeArea {
 		{
 			subs += tna.toString()+ " ";
 		}
-		return identifier+": ("+xPosLow+", "+yPosLow+") SubAreas:"+"("+subs+")";
+		return identifier+": ("+xPos+", "+yPos+") SubAreas:"+"("+subs+")";
 	}
 }

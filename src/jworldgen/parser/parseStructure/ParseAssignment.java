@@ -17,4 +17,9 @@ public class ParseAssignment {
 	{
 		resolver.setVariable(identifier, expression.evaluate(rng, resolver));
 	}
+	
+	public String toString()
+	{
+		return identifier + " = " + expression.toString();
+	}
 }

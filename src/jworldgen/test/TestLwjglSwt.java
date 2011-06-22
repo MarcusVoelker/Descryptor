@@ -57,20 +57,22 @@ public class TestLwjglSwt {
 		}
 	}
 
-	public static void main(String [] args) {
+	public static void main(String[] args) {
 		final Display display = new Display();
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 		Composite comp = new Composite(shell, SWT.NONE);
 		comp.setLayout(new FillLayout());
-		GLData data = new GLData ();
+		GLData data = new GLData();
 		data.doubleBuffer = true;
 		final GLCanvas canvas = new GLCanvas(comp, SWT.NONE, data);
 
 		canvas.setCurrent();
 		try {
 			GLContext.useContext(canvas);
-		} catch(LWJGLException e) { e.printStackTrace(); }
+		} catch (LWJGLException e) {
+			e.printStackTrace();
+		}
 
 		canvas.addListener(SWT.Resize, new Listener() {
 			public void handleEvent(Event event) {
@@ -79,7 +81,9 @@ public class TestLwjglSwt {
 				canvas.setCurrent();
 				try {
 					GLContext.useContext(canvas);
-				} catch(LWJGLException e) { e.printStackTrace(); }
+				} catch (LWJGLException e) {
+					e.printStackTrace();
+				}
 				GL11.glViewport(0, 0, bounds.width, bounds.height);
 				GL11.glMatrixMode(GL11.GL_PROJECTION);
 				GL11.glLoadIdentity();
@@ -102,13 +106,17 @@ public class TestLwjglSwt {
 
 		display.asyncExec(new Runnable() {
 			int rot = 0;
+
 			public void run() {
 				if (!canvas.isDisposed()) {
 					canvas.setCurrent();
 					try {
 						GLContext.useContext(canvas);
-					} catch(LWJGLException e) { e.printStackTrace(); }
-					GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+					} catch (LWJGLException e) {
+						e.printStackTrace();
+					}
+					GL11.glClear(GL11.GL_COLOR_BUFFER_BIT
+							| GL11.GL_DEPTH_BUFFER_BIT);
 					GL11.glClearColor(.3f, .5f, .8f, 1.0f);
 					GL11.glLoadIdentity();
 					GL11.glTranslatef(0.0f, 0.0f, -10.0f);
@@ -118,7 +126,8 @@ public class TestLwjglSwt {
 					rot++;
 					GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 					GL11.glColor3f(0.9f, 0.9f, 0.9f);
-					drawTorus(1, 1.9f + ((float) Math.sin((0.004f * frot))), 15, 15);
+					drawTorus(1, 1.9f + ((float) Math.sin((0.004f * frot))),
+							15, 15);
 					canvas.swapBuffers();
 					display.asyncExec(this);
 				}
