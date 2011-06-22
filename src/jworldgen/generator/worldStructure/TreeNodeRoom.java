@@ -1,6 +1,5 @@
 package jworldgen.generator.worldStructure;
 
-import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.generator.RNG;
