@@ -17,9 +17,11 @@ public class ParseALE {
 	public Number evaluate(RNG rng, VariableResolver resolver)
 	{
 		Stack<Number> evaluation = new Stack<Number>();
-		while(!postfix.isEmpty())
+		@SuppressWarnings("unchecked")
+		LinkedList<ALEQueueElement> postCopy = (LinkedList<ALEQueueElement>) postfix.clone();
+		while(!postCopy.isEmpty())
 		{
-			ALEQueueElement element = postfix.poll();
+			ALEQueueElement element = postCopy.poll();
 			switch(element.type.arity)
 			{
 				case 0:

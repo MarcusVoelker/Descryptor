@@ -35,8 +35,8 @@ public class TestStartup {
 	public static void main(String[] args)
 	{
 		try {
-			World world = Generator.generateFromFile("data/TestRules.txt", 500, 500);
-			Display.setDisplayMode(new DisplayMode(500,500));
+			World world = Generator.generateFromFile("data/TestRules.txt", 1000, 1000);
+			Display.setDisplayMode(new DisplayMode(1000,1000));
 			Display.create();
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();

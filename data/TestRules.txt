@@ -52,14 +52,16 @@ Area World {
 
 Area Sky {
 	Type = None
+	
 	SubArea {
-		AreaType = GoldenGround
+		AreaType = Ground
 		count = 1;
 		xPos = 0.0:0.5;
-		yPos = 0.0:0.4;
-		width = 0.75 - xPos;
-		height = 0.5 - yPos;
+		yPos = 0.0:0.5;
+		width = 0.5-xPos;
+		height = 0.5-yPos;
 	}
+	
 /*	SubArea{
 		AreaType = Tower 
 		count = 1:5;

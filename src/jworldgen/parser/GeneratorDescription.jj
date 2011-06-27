@@ -55,7 +55,7 @@ TOKEN: /* ALE Operators */
 | < MINUS : "-" >
 | < MULTIPLY : "*" >
 | < DIVIDE : "/" >
-| < RANDOM : ":" >}TOKEN : /* Misc Identifiers */{  < INTEGER : (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
+| < RANDOM : ":" >}TOKEN : /* Misc Identifiers */{  < INTEGER : (< MINUS >)? (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
 | < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
 | < FLOAT : < INTEGER > "." < INTEGER > >
 | < EOL : ";" >}

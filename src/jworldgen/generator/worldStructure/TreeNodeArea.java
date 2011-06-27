@@ -78,9 +78,13 @@ public class TreeNodeArea {
 		return result;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setAssignments(ArrayList<ParseAssignment> assignments)
 	{
-		this.assignments = assignments;
+		if (assignments == null)
+			this.assignments = null;
+		else
+			this.assignments = (ArrayList<ParseAssignment>) assignments.clone();
 	}
 	public void addSubArea(TreeNodeArea area) throws CriticalFailure
 	{
@@ -140,8 +144,15 @@ public class TreeNodeArea {
 	
 	protected  int calculateCount(RNG rng)
 	{
-		//TODO: Calculate it!
-		return 1;
+		VariableResolver resolver = new VariableResolver();
+		if (assignments != null)
+		{
+			for (ParseAssignment assignment : assignments)
+			{
+				assignment.evaluate(rng, resolver);
+			}
+		}
+		return (Integer) resolver.getVariable("count");
 	}
 	
 	public void setAsRootNode()
@@ -183,14 +194,18 @@ public class TreeNodeArea {
 			yPos = ((Float) resolver.getVariable("yPos"))*parentHeight+parentYPos;
 			if (!isStamp)
 			{
-				width = ((Float) resolver.getVariable("width"))*parentWidth+parentXPos;
-				height = ((Float) resolver.getVariable("height"))*parentHeight+parentYPos;
+				width = ((Float) resolver.getVariable("width"))*parentWidth;
+				height = ((Float) resolver.getVariable("height"))*parentHeight;
 			}
 		}
 		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
 		
 		for (TreeNodeArea tna: subAreas)
 		{
+			if (tna.getIdentifier().equals("GoldenGround"))
+			{
+					int ix = 0;
+			}
 			int newSubCount = tna.calculateCount(rng);
 			for (int i = 0; i < newSubCount; i++)
 			{
