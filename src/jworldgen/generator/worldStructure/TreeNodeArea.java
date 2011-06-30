@@ -22,8 +22,10 @@ public class TreeNodeArea {
 	
 	protected float xPos;
 	protected float yPos;
+	protected float zPos;
 	protected float width;
 	protected float height;
+	protected float depth;
 	
 	protected String identifier;
 	
@@ -111,23 +113,6 @@ public class TreeNodeArea {
 		return identifier;
 	}
 	
-	public void addRoom(TreeNodeRoom room) throws CriticalFailure
-	{
-		subAreas.add(room);
-		String roomName = room.getIdentifier();
-		for (ParseSubArea parseSubArea : parseSubAreas)
-		{
-			if (parseSubArea.areaType.equals(roomName))
-			{
-				room.setAssignments(parseSubArea.assignments);
-				if (parseSubArea.isStamp)
-					room.makeStamp();
-				parseSubAreas.remove(parseSubArea);
-				break;
-			}
-		}
-	}
-	
 	public void addModifier(Modifier mod) throws CriticalFailure
 	{
 		modifiers.add(mod);
@@ -159,8 +144,10 @@ public class TreeNodeArea {
 	{
 		xPos = 0;
 		yPos = 0;
+		zPos = 0;
 		width = 1;
 		height = 1;
+		depth = 1;
 	}
 	
 	protected float resolveSymbolicValue(float symbol, int index, int subCount)
@@ -180,7 +167,7 @@ public class TreeNodeArea {
 		
 	}
 	
-	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentXPos, float parentYPos, int index, int subCount)
+	public void expandToWorldTree(RNG rng, float parentHeight, float parentWidth, float parentDepth, float parentXPos, float parentYPos, float parentZPos, int index, int subCount)
 	{
 		ExceptionLogger.log("Expanding Area \""+identifier+"\"", LoggerLevel.FINEST);
 		VariableResolver resolver = new VariableResolver();
@@ -192,25 +179,29 @@ public class TreeNodeArea {
 			}
 			xPos = ((Float) resolver.getVariable("xPos"))*parentWidth+parentXPos;
 			yPos = ((Float) resolver.getVariable("yPos"))*parentHeight+parentYPos;
+			if (resolver.isDefined("zPos"))
+				zPos = ((Float) resolver.getVariable("zPos"))*parentDepth+parentZPos;
+			else
+				zPos = 0.0f;
 			if (!isStamp)
 			{
 				width = ((Float) resolver.getVariable("width"))*parentWidth;
 				height = ((Float) resolver.getVariable("height"))*parentHeight;
+				if (resolver.isDefined("depth"))
+					depth = ((Float) resolver.getVariable("depth"))*parentDepth;
+				else
+					depth = 1.0f;
 			}
 		}
 		ArrayList<TreeNodeArea> realSubAreas = new ArrayList<TreeNodeArea>();
 		
 		for (TreeNodeArea tna: subAreas)
 		{
-			if (tna.getIdentifier().equals("GoldenGround"))
-			{
-					int ix = 0;
-			}
 			int newSubCount = tna.calculateCount(rng);
 			for (int i = 0; i < newSubCount; i++)
 			{
 				TreeNodeArea newArea = tna.clone();
-				newArea.expandToWorldTree(rng, height, width, xPos, yPos, i, newSubCount);
+				newArea.expandToWorldTree(rng, height, width, depth, xPos, yPos, zPos, i, newSubCount);
 				realSubAreas.add(newArea);
 			}
 		}
@@ -220,13 +211,13 @@ public class TreeNodeArea {
 	private void determineValue(RNG rng, World world, int x, int y, int z)
 	{
 		if (tileID != 0)
-			world.setValue(x, y, tileID);
+			world.setValue(x, y, z, tileID);
 		for (Modifier mod : modifiers)
 		{
-			int value = mod.getValue(x, y, 0);
+			int value = mod.getValue(x, y, z);
 			if (value != 0)
 			{
-				world.setValue(x, y, value);
+				world.setValue(x, y, z, value);
 			}
 		}
 	}
@@ -242,7 +233,10 @@ public class TreeNodeArea {
 			{
 				for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor(yPos*world.getHeight()+height); y++)
 				{			
-					determineValue(rng,world,x,y,0);
+					for (int z = (int) Math.floor(zPos*world.getDepth()); z < (int) Math.floor(zPos*world.getDepth()+depth); z++)
+					{			
+						determineValue(rng,world,x,y,z);
+					}
 				}
 			}
 			return;
@@ -251,7 +245,10 @@ public class TreeNodeArea {
 		{
 			for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor((yPos+height)*world.getHeight()); y++)
 			{
-				determineValue(rng,world,x,y,0);
+				for (int z = (int) Math.floor(zPos*world.getDepth()); z < (int) Math.floor((zPos+depth)*world.getDepth()); z++)
+				{
+					determineValue(rng,world,x,y,z);
+				}
 			}
 		}
 		

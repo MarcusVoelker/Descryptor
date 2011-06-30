@@ -27,6 +27,10 @@ public class ParseALE {
 				case 0:
 					evaluation.push(element.toValue(rng,resolver));
 					break;
+				case 1:
+					Number v = evaluation.pop();
+					evaluation.push(element.toValue(v,rng));
+					break;
 				case 2:
 					Number v2 = evaluation.pop();
 					Number v1 = evaluation.pop();

@@ -25,7 +25,7 @@ public class RuleParser{  public static ParseList parse(String ruleCode) throw
 {
   "*/": DEFAULT
 }
-TOKEN : /* Partitions */{  < ROOM : "Room" >| < AREA : "Area" >| < SUBAREA : "SubArea" >
+TOKEN : /* Partitions */{  < AREA : "Area" >| < SUBAREA : "SubArea" >
 | < STAMP : "Stamp" >
 | < MODIFIER : "Modifier" >}
 
@@ -55,7 +55,13 @@ TOKEN: /* ALE Operators */
 | < MINUS : "-" >
 | < MULTIPLY : "*" >
 | < DIVIDE : "/" >
-| < RANDOM : ":" >}TOKEN : /* Misc Identifiers */{  < INTEGER : (< MINUS >)? (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
+| < RANDOM : ":" >}
+
+TOKEN: /* ALE Functions */
+{  < SIN: "sin" >
+| < COS: "cos" >
+| < TAN: "tan" >
+}TOKEN : /* Misc Identifiers */{  < INTEGER : (< MINUS >)? (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
 | < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
 | < FLOAT : < INTEGER > "." < INTEGER > >
 | < EOL : ";" >}
@@ -65,12 +71,8 @@ ParseList parseRoot():
 {	partition(list)
 	{
 	  return list;	}
-}void partition(ParseList list) :{ParseRoom room; ParseArea area; ParseModifier modifier;}{  room = room() partition(list)
-  {
-    list.addRoom(room);
-  }
-  
-| area = area() partition(list)
+}
+void partition(ParseList list) :{ParseArea area; ParseModifier modifier;}{  area = area() partition(list)
   {
     list.addArea(area);
   }
@@ -79,26 +81,6 @@ ParseList parseRoot():
     list.addModifier(modifier);
   }
 | < EOF >}
-
-void roomLine(ParseRoom room) :
-{Token block;}
-{
-  < WBLOCK > "=" block = < IDENT >
-  {
-    room.setWalls(block.image);  }
-| < FBLOCK > "=" block = < IDENT >
-  {
-    room.setFloor(block.image);
-  }
-| < CBLOCK > "=" block = < IDENT >
-  {
-    room.setCeiling(block.image);
-  }
-| < BG > "=" block = < IDENT >
-  {
-    room.setBackground(block.image);
-  }
-}
 
 void areaLine(ParseArea area) :
 {Token probType; Token modType;}
@@ -113,7 +95,7 @@ void areaLine(ParseArea area) :
 }
 
 void modifierLine(ParseModifier modifier) :
-{Token probType; Token id;}
+{Token probType; Token id; ParseAssignment assignment;}
 {
   < TYPE > id = < INTEGER > "=" probType = < IDENT >
   {
@@ -122,6 +104,10 @@ void modifierLine(ParseModifier modifier) :
 | < PROB > id = < INTEGER > "=" probType = < INTEGER >
   {
     modifier.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
+  }
+| assignment = assignment()
+  {
+    modifier.assignments.add(assignment);
   }
 }
 
@@ -155,15 +141,6 @@ void stampLine(ParseSubArea subArea) :
 | assignment = assignment()
   {
     subArea.assignments.add(assignment);
-  }
-}
-
-ParseRoom room() :
-{ParseRoom room = new ParseRoom(); Token ident;}
-{
-  < ROOM > ident = < IDENT > "{" (roomLine(room))* "}"
-  {
-    room.setIdentifier(ident.image);	return room;
   }
 }
 
@@ -281,7 +258,7 @@ ParseALE ale():
 void aleShunt(LinkedList<ALEQueueElement>  output, Stack opStack):
 {}
 {
- 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleLeaf(output))* < EOL > }
+ 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleFunction(opStack) | aleLeaf(output))* < EOL > }
 
 void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 {Token t;}
@@ -297,6 +274,13 @@ void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 			output.add((ALEQueueElement) opStack.pop());
 		}
 		opStack.pop();
+	}
+|   t = ","
+	{
+	  	while (!opStack.peek().equals("("))
+		{
+			output.add((ALEQueueElement) opStack.pop());
+		}
 	}
 }
 
@@ -330,6 +314,21 @@ void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 			output.add((ALEQueueElement) opStack.pop());
 		}
 		opStack.push(new ALEQueueElement(t.image,ALEElementType.RANDOM));
+	}
+}
+
+void aleFunction(Stack opStack):
+{Token t; ALEElementType type;}
+{
+	(
+	  t = < SIN > { type = ALEElementType.SINE; }
+	|
+	  t = < COS > { type = ALEElementType.COSINE; }
+	|
+	  t = < TAN > { type = ALEElementType.TANGENT; }
+	)
+	{
+		opStack.push(new ALEQueueElement(t.image,type));
 	}
 }
 

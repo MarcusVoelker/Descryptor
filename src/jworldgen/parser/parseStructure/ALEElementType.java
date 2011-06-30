@@ -4,6 +4,7 @@ public enum ALEElementType {
 	//0-ary nodes
 	VARIABLE(0), INTEGER(0), FLOAT(0),
 	//unary nodes
+	SINE(1), COSINE(1), TANGENT(1),
 	//binary nodes
 	PLUS(2), MINUS(2), MULTIPLY(2), DIVIDE(2), RANDOM(2),
 	//Error

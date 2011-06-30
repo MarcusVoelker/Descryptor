@@ -28,7 +28,6 @@ public class Ruleset
 	private void createFromParseList(ParseList list) throws CriticalFailure
 	{
 		list.insertBlockIDs(blockMap);
-		Hashtable<String,TreeNodeRoom> rooms = list.createRoomNodes();
 		Hashtable<String,TreeNodeArea> areas = list.createAreaNodes();
 		Hashtable<String,Modifier> modifiers = list.createModifiers();	
 		for (Enumeration<String> e = areas.keys(); e.hasMoreElements();)
@@ -64,15 +63,7 @@ public class Ruleset
 				}
 				else
 				{
-					if (!rooms.containsKey(name))
-					{
-						ExceptionLogger.logException(new UnknownIdentifier(name), LoggerLevel.ERROR);
-					}
-					else
-					{
-						ExceptionLogger.log("Adding Room \""+name+"\"", LoggerLevel.FINEST);
-						areas.get(areaName).addRoom(rooms.get(name).clone());
-					}
+					ExceptionLogger.logException(new UnknownIdentifier(name), LoggerLevel.ERROR);
 				}
 			}
 		}
@@ -99,7 +90,7 @@ public class Ruleset
 	
 	public void expandToWorldTree(RNG rng)
 	{
-		world.expandToWorldTree(rng, 1, 1, 0, 0, 0, 0);
+		world.expandToWorldTree(rng, 1, 1, 1, 0, 0, 0, 0, 0);
 		ExceptionLogger.log("World successfully expanded", LoggerLevel.COARSE);
 	}
 	public String toString()

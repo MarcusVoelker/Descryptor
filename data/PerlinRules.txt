@@ -1,0 +1,26 @@
+Modifier Perlin {
+	scale = 16;
+	Prob 1 = 2
+	Type 1 = Earth
+	Prob 2 = 1
+	Type 2 = Stone
+}
+
+Area World {
+	Type = None
+	SubArea {
+		AreaType = PArea
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.0;
+		zPos = 0.0;
+		width = 1.0;
+		height = 1.0;
+		depth = 1.0;
+	}
+}
+
+Area PArea {
+	Type = None
+	Modifier Perlin	
+}

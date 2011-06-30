@@ -27,6 +27,20 @@ public class ALEQueueElement {
 		return null;
 	}
 	
+	private Float toFloat(Float v, RNG rng)
+	{
+		switch (type)
+		{
+		case SINE:
+			return (float) Math.sin(v);
+		case COSINE:
+			return (float) Math.cos(v);
+		case TANGENT:
+			return (float) Math.tan(v);
+		}
+		return null;
+	}
+	
 	private Float toFloat(Float v1,Float v2, RNG rng)
 	{
 		switch (type)
@@ -62,6 +76,12 @@ public class ALEQueueElement {
 		}
 		return null;
 	}
+	
+	public Number toValue(Number v, RNG rng)
+	{
+		return toFloat((Float) v, rng);
+	}
+	
 	public Number toValue(Number v1, Number v2, RNG rng)
 	{
 		if ((v1 instanceof Integer) && (v2 instanceof Integer))

@@ -18,45 +18,45 @@ public class Generator {
 		this.rules = rules;
 	}
 	
-	public World generateRandomly(int width, int height)
+	public World generateRandomly(int width, int height, int depth)
 	{
 		this.randomNumberGenerator = new RNG();
 		TreeNodeArea world = rules.getWorld();
-		World blockWorld = new World(width,height);
+		World blockWorld = new World(width,height,depth);
 		world.fillWorld(randomNumberGenerator,blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}
 	
-	public World generateFromSeed(long seed, int width, int height)
+	public World generateFromSeed(long seed, int width, int height, int depth)
 	{
 		this.randomNumberGenerator = new RNG(seed);
 		TreeNodeArea world = rules.getWorld();
-		World blockWorld = new World(width,height);
+		World blockWorld = new World(width,height,depth);
 		world.fillWorld(randomNumberGenerator,blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}
 	
-	public static World generateFromFile(String fileName, long seed, int width, int height) throws CriticalFailure
+	public static World generateFromFile(String fileName, long seed, int width, int height, int depth) throws CriticalFailure
 	{
 		String input = TextFileReader.readTextFile(fileName);
 		ParseList list = RuleParser.parse(input);
 		Ruleset rules = new Ruleset(list);
 		rules.expandToWorldTree(new RNG(seed));
 		Generator gen = new Generator(rules);
-		World world = gen.generateFromSeed(seed, width, height);
+		World world = gen.generateFromSeed(seed, width, height, depth);
 		return world;
 	}
 	
-	public static World generateFromFile(String fileName, int width, int height) throws CriticalFailure
+	public static World generateFromFile(String fileName, int width, int height, int depth) throws CriticalFailure
 	{
 		String input = TextFileReader.readTextFile(fileName);
 		ParseList list = RuleParser.parse(input);
 		Ruleset rules = new Ruleset(list);
 		rules.expandToWorldTree(new RNG());
 		Generator gen = new Generator(rules);
-		World world = gen.generateRandomly(width, height);
+		World world = gen.generateRandomly(width, height, depth);
 		return world;
 	}
 }

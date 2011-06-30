@@ -1,5 +1,6 @@
 package jworldgen.parser.parseStructure;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -10,6 +11,8 @@ public class ParseModifier {
 	private Hashtable<Integer,String> types;
 	private Hashtable<Integer,Integer> typeIDs;
 	
+	public ArrayList<ParseAssignment> assignments;
+	
 	private String identifier;
 	
 	public ParseModifier()
@@ -17,6 +20,7 @@ public class ParseModifier {
 		probabilities = new Hashtable<Integer,Integer>();
 		types = new Hashtable<Integer,String>();
 		typeIDs = new Hashtable<Integer,Integer>();
+		assignments = new ArrayList<ParseAssignment>();
 	}
 	public void addProb(int value, int id)
 	{
@@ -50,6 +54,6 @@ public class ParseModifier {
 	
 	public Modifier toModifier()
 	{
-		return new Modifier(probabilities,typeIDs,identifier);
+		return new Modifier(probabilities,typeIDs,identifier,assignments);
 	}
 }

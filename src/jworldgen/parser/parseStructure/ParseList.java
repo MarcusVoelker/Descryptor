@@ -5,26 +5,18 @@ import java.util.Hashtable;
 
 import jworldgen.generator.worldStructure.Modifier;
 import jworldgen.generator.worldStructure.TreeNodeArea;
-import jworldgen.generator.worldStructure.TreeNodeRoom;
 
 public class ParseList {
-	private ArrayList<ParseRoom> rooms;
 	private ArrayList<ParseArea> areas;
 	private ArrayList<ParseModifier> modifiers;
 	private ArrayList<ParseKind> kinds;
 	public ParseList()
 	{
-		rooms = new ArrayList<ParseRoom>();
 		areas = new ArrayList<ParseArea>();
 		modifiers = new ArrayList<ParseModifier>();
 		kinds = new ArrayList<ParseKind>();
 	}
 	
-	public void addRoom (ParseRoom room)
-	{
-		rooms.add(room);
-		kinds.add(ParseKind.ROOM);
-	}
 	
 	public void addArea(ParseArea area)
 	{
@@ -40,10 +32,6 @@ public class ParseList {
 	
 	public void insertBlockIDs(BlockMap blockmap)
 	{
-		for(ParseRoom room : rooms)
-		{
-			room.insertBlockIDs(blockmap);
-		}
 		for(ParseArea area : areas)
 		{
 			area.insertBlockID(blockmap);
@@ -52,21 +40,6 @@ public class ParseList {
 		{
 			modifier.insertBlockIDs(blockmap);
 		}
-	}
-	
-	public String toString()
-	{
-		return (rooms.size()+"|"+areas.size());
-	}
-	
-	public Hashtable<String,TreeNodeRoom> createRoomNodes()
-	{
-		Hashtable<String,TreeNodeRoom> roomNodes = new Hashtable<String,TreeNodeRoom>();
-		for (ParseRoom room : rooms)
-		{
-			roomNodes.put(room.getIdentifier(), room.toRoomNode());
-		}
-		return roomNodes;
 	}
 	
 	public Hashtable<String,TreeNodeArea> createAreaNodes()

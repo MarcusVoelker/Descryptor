@@ -35,9 +35,9 @@ public class TestStartup {
 	public static void main(String[] args)
 	{
 		try {
-			World world = Generator.generateFromFile("data/TestRules.txt", 1000, 1000);
-			Display.setDisplayMode(new DisplayMode(1000,1000));
+			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
+			World world = Generator.generateFromFile("data/TestRules.txt", 100, 100, 1);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
@@ -48,25 +48,26 @@ public class TestStartup {
 			{
 				// Clear the screen and depth buffer
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);	
-						
-				for (int i =0; i < world.getWidth(); i++)
+				for (int k = 0; k < world.getDepth(); k++)
 				{
-					for (int j = 0; j < world.getHeight(); j++)
+					for (int i =0; i < world.getWidth(); i++)
 					{
-						int color = world.getValue(i, j);
-						setColor(color,0.5f,color/10.0f,10);
-						
-						// draw quad
-						GL11.glBegin(GL11.GL_QUADS);
-						    GL11.glVertex2f(widthFactor*i,heightFactor*j);
-						    GL11.glVertex2f(widthFactor*(i+1),heightFactor*j);
-						    GL11.glVertex2f(widthFactor*(i+1),heightFactor*(j+1));
-						    GL11.glVertex2f(widthFactor*i,heightFactor*(j+1));
-						GL11.glEnd();
+						for (int j = 0; j < world.getHeight(); j++)
+						{
+							int color = world.getValue(i, j, k);
+							setColor(color,0.5f,color/10.0f,10);
+							
+							// draw quad
+							GL11.glBegin(GL11.GL_QUADS);
+							    GL11.glVertex2f(widthFactor*i,heightFactor*j);
+							    GL11.glVertex2f(widthFactor*(i+1),heightFactor*j);
+							    GL11.glVertex2f(widthFactor*(i+1),heightFactor*(j+1));
+							    GL11.glVertex2f(widthFactor*i,heightFactor*(j+1));
+							GL11.glEnd();
+						}
 					}
+					Display.update();
 				}
-				
-				Display.update();
 			}
 			Display.destroy();
 		} catch (LWJGLException e) {

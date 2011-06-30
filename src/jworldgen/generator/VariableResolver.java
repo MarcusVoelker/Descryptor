@@ -19,4 +19,9 @@ public class VariableResolver {
 	{
 		return varTable.get(identifier);
 	}
+	
+	public boolean isDefined (String identifier)
+	{
+		return varTable.containsKey(identifier);
+	}
 }

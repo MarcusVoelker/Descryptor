@@ -1,11 +1,5 @@
-Room TestRoom {
-	WallBlock = Wall
-	FloorBlock = Floor
-	CeilingBlock = Ceiling
-	Background = StoneWall
-}
-
 Modifier Stone {
+	scale = 128;
 	Prob 1 = 1
 	Type 1 = Stone
 	Prob 2 = 1
@@ -15,6 +9,7 @@ Modifier Stone {
 }
 
 Modifier Iron {
+	scale = 32;
 	Prob 1 = 2
 	Type 1 = None	
 	Prob 2 = 1
@@ -22,10 +17,19 @@ Modifier Iron {
 }
 
 Modifier Gold {
+	scale = 16;
 	Prob 1 = 5
 	Type 1 = None	
 	Prob 2 = 2
 	Type 2 = Gold
+}
+
+Modifier SurMod {
+	scale = 16;
+	Prob 1 = 2
+	Type 1 = Sand
+	Prob 2 = 3
+	Type 2 = None
 }
 
 Area World {
@@ -50,39 +54,54 @@ Area World {
 	}
 }
 
+Area Blob {
+	Type = Blob
+}
+Area Surface {
+	Type = None
+	Modifier SurMod
+}
 Area Sky {
 	Type = None
 	
 	SubArea {
-		AreaType = Ground
-		count = 1;
-		xPos = 0.0:0.5;
-		yPos = 0.0:0.5;
-		width = 0.5-xPos;
-		height = 0.5-yPos;
+		AreaType = Blob
+		count = 1000;
+		rand = 0.0:6.2;
+		xPos = 0.45+0.5*sin(rand);
+		yPos = 0.45+0.5*cos(rand);
+		width = 0.1;
+		height = 0.1;
 	}
 	
-/*	SubArea{
-		AreaType = Tower 
-		count = 1:5;
-		xPos = 0.0:0.8;
-		yPos = 0.1;
-		width = 0.1:0.2;
-		height = 0.9;
-	}*/
-}
-/*
-Area Tower {
-	Type = None
 	SubArea {
-		RoomType = TestRoom
-		count = 5:10;
-		xPos = 0.0;
-		yPos = $i;
-		width = 1.0;
-		height = $n;
+		AreaType = Tower
+		count = 1:10;
+		xPos = 0.0:0.9;
+		yPos = 0.1:0.6;
+		/*zPos = 0.0:0.9;*/
+		width = 0.1;
+		height = 1.0-yPos;
+		/*depth = 0.1;*/
 	}
-}*/
+}
+
+Area Interior {
+	Type = Inside
+}
+
+Area Tower {
+	Type = Wood
+	SubArea {
+		AreaType = Interior
+		count = 1;
+		xPos = 0.1;
+		yPos = 0.05;
+		width = 0.8;
+		height = 0.95;
+	}
+}
+
 Area Ground {
 	Type = Earth
 	Modifier Stone
@@ -94,23 +113,15 @@ Area Ground {
 		yPos = 0.8;
 		width = 1.0;
 		height = 0.2;
-	}/*
-	SubArea {
-		RoomType = TestRoom
-		count = 5:15;
-		xPos = $i;
-		yPos = 0.4:0.8;
-		width = $n;
-		height = 0.2;
 	}
-	Stamp {
-		RoomType = TestRoom
-		count = 5;
-		xPos = 0.0:1.0;
-		yPos = 0.0:0.4;
-		width = 5:15;
-		height = 4;
-	}*/
+	SubArea{
+		AreaType = Surface
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.0;
+		width = 1.0;
+		height = 0.05;
+	}
 }
 Area GoldenGround {
 	Type = None

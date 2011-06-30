@@ -1,11 +1,11 @@
 package jworldgen.generator;
 
 public class World {
-	private int[][] rawData;
+	private int[][][] rawData;
 	
-	public World(int width, int height)
+	public World(int width, int height, int depth)
 	{
-		rawData = new int[width][height];
+		rawData = new int[width][height][depth];
 	}
 	
 	public int getWidth()
@@ -18,31 +18,23 @@ public class World {
 		return rawData[0].length;
 	}
 	
-	public void setValue(int x, int y, int value)
+	public int getDepth()
 	{
-		if (x >= getWidth() || y >= getHeight() || x < 0 || y < 0)
+		return rawData[0][0].length;
+	}
+	
+	public void setValue(int x, int y, int z, int value)
+	{
+		if (x >= getWidth() || y >= getHeight() || z >= getDepth() || x < 0 || y < 0 || z < 0)
 		{
 			return;
 		}
-		rawData[x][y] = value;
+		rawData[x][y][z] = value;
 	}
 	
-	public int getValue(int x, int y)
+	public int getValue(int x, int y, int z)
 	{
-		return rawData[x][y];
+		return rawData[x][y][z];
 	}
 	
-	public String toString()
-	{
-		String result = "";
-		for (int i = 0; i < getHeight();i++)
-		{
-			for (int j = 0; j < getWidth(); j++)
-			{
-				result += rawData[j][i];
-			}
-			result += "\n";
-		}
-		return result;
-	}
 }
