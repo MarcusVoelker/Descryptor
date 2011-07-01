@@ -1,4 +1,5 @@
 Modifier Stone {
+	ModType = Perlin
 	scale = 128;
 	Prob 1 = 1
 	Type 1 = Stone
@@ -9,6 +10,7 @@ Modifier Stone {
 }
 
 Modifier Iron {
+	ModType = Perlin
 	scale = 32;
 	Prob 1 = 2
 	Type 1 = None	
@@ -17,6 +19,7 @@ Modifier Iron {
 }
 
 Modifier Gold {
+	ModType = Perlin
 	scale = 16;
 	Prob 1 = 5
 	Type 1 = None	
@@ -25,6 +28,7 @@ Modifier Gold {
 }
 
 Modifier SurMod {
+	ModType = Perlin
 	scale = 16;
 	Prob 1 = 2
 	Type 1 = Sand

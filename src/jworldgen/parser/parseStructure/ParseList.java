@@ -3,8 +3,8 @@ package jworldgen.parser.parseStructure;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-import jworldgen.generator.worldStructure.Modifier;
 import jworldgen.generator.worldStructure.TreeNodeArea;
+import jworldgen.generator.worldStructure.modifiers.Modifier;
 
 public class ParseList {
 	private ArrayList<ParseArea> areas;

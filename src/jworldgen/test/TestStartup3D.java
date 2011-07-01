@@ -8,7 +8,6 @@ import jworldgen.generator.World;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -69,8 +68,6 @@ public class TestStartup3D {
 			GLU.gluPerspective(45.0f, 1.0f, 0.5f, 400.0f);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			glEnable(GL_DEPTH_TEST);
-			float widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
-			float heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
 			float angle = 0.01f;
 			while(!Display.isCloseRequested())
 			{

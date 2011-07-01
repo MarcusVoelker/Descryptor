@@ -9,6 +9,7 @@ import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 import jworldgen.generator.World;
+import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 

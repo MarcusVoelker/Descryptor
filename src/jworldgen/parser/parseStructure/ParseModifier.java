@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import jworldgen.generator.worldStructure.Modifier;
+import jworldgen.exceptionHandler.CriticalFailure;
+import jworldgen.exceptionHandler.ExceptionLogger;
+import jworldgen.exceptionHandler.IllegalModifierType;
+import jworldgen.exceptionHandler.LoggerLevel;
+import jworldgen.generator.worldStructure.modifiers.Modifier;
+import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
 
 public class ParseModifier {
 	private Hashtable<Integer,Integer> probabilities;
@@ -14,6 +19,7 @@ public class ParseModifier {
 	public ArrayList<ParseAssignment> assignments;
 	
 	private String identifier;
+	private String type;
 	
 	public ParseModifier()
 	{
@@ -42,6 +48,11 @@ public class ParseModifier {
 		return identifier;
 	}
 	
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+	
 	public void insertBlockIDs(BlockMap blockmap)
 	{
 		for (Enumeration<Integer> e = types.keys(); e.hasMoreElements();)
@@ -54,6 +65,13 @@ public class ParseModifier {
 	
 	public Modifier toModifier()
 	{
-		return new Modifier(probabilities,typeIDs,identifier,assignments);
+		if (type.equals("Perlin"))
+			return new PerlinModifier(probabilities,typeIDs,identifier,assignments);
+		try {
+			ExceptionLogger.logException(new IllegalModifierType(type), LoggerLevel.ERROR);
+		} catch (CriticalFailure e) {
+			//Should not be reachable
+		}
+		return null;
 	}
 }

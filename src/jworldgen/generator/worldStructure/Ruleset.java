@@ -10,6 +10,7 @@ import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.NoWorldException;
 import jworldgen.exceptionHandler.UnknownIdentifier;
 import jworldgen.generator.RNG;
+import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
 
