@@ -28,12 +28,10 @@ Modifier Gold {
 }
 
 Modifier SurMod {
-	ModType = Perlin
+	ModType = WeightedPerlin
 	scale = 16;
-	Prob 1 = 2
-	Type 1 = Sand
-	Prob 2 = 3
-	Type 2 = None
+	Type 1 = None
+	Type 2 = Sand
 }
 
 Area World {

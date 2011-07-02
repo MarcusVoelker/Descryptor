@@ -37,7 +37,7 @@ public class TestStartup {
 		try {
 			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
-			World world = Generator.generateFromFile("data/PerlinRules.txt", 400, 400, 1);
+			World world = Generator.generateFromFile("data/TestRules.txt", 400, 400, 1);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
