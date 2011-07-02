@@ -4,19 +4,23 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import jworldgen.generator.PerlinGenerator;
+import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class PerlinModifier extends Modifier {
 	
-	private Hashtable<Integer,Integer> probabilities;
-	private Hashtable<Integer,Integer> typeIDs;
+	protected Hashtable<Integer,Integer> probabilities;
+	protected Hashtable<Integer,Integer> typeIDs;
+	protected PerlinGenerator perlin;
 	
 	int probSum;
 	
 	public PerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments)
 	{
 		super(identifier, assignments);
+		this.type = ModifierType.PERLIN;
 		this.probabilities = probabilities;
 		this.typeIDs = typeIDs;
 		this.identifier = identifier;
@@ -28,6 +32,11 @@ public class PerlinModifier extends Modifier {
 		}
 	}
 	
+	public void setRNG(RNG rng, int size)
+	{
+		super.setRNG(rng);
+		perlin = new PerlinGenerator(rng, size);
+	}
 	public int getValue(int x, int y, int z)
 	{
 		VariableResolver resolver = new VariableResolver();

@@ -10,6 +10,7 @@ import jworldgen.exceptionHandler.IllegalModifierType;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
+import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
 
 public class ParseModifier {
 	private Hashtable<Integer,Integer> probabilities;
@@ -67,6 +68,8 @@ public class ParseModifier {
 	{
 		if (type.equals("Perlin"))
 			return new PerlinModifier(probabilities,typeIDs,identifier,assignments);
+		if (type.equals("WeightedPerlin"))
+			return new WeightedPerlinModifier(typeIDs,identifier,assignments);
 		try {
 			ExceptionLogger.logException(new IllegalModifierType(type), LoggerLevel.ERROR);
 		} catch (CriticalFailure e) {

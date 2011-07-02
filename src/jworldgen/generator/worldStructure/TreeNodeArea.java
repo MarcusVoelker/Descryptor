@@ -10,6 +10,8 @@ import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 import jworldgen.generator.World;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
+import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
+import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
 import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
@@ -224,9 +226,25 @@ public class TreeNodeArea {
 	}
 	public void fillWorld(RNG rng, World world)
 	{
+		int minX = (int) Math.floor(xPos*world.getWidth());
+		int minY = (int) Math.floor(yPos*world.getHeight());
+		int minZ = (int) Math.floor(zPos*world.getDepth());
+		int maxX = (int) Math.floor((xPos+width)*world.getWidth());
+		int maxY = (int) Math.floor((yPos+height)*world.getHeight());
+		int maxZ = (int) Math.floor((zPos+depth)*world.getDepth());
 		for (Modifier mod : modifiers)
 		{
-			mod.setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
+			switch(mod.getType())
+			{
+			case PERLIN:
+				((PerlinModifier) mod).setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
+				mod.setLocation(minX, minY, minZ, maxX, maxY, maxZ);
+				break;
+			case WEIGHTED_PERLIN:
+				((WeightedPerlinModifier) mod).setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
+				mod.setLocation(minX, minY, minZ, maxX, maxY, maxZ);
+				break;
+			}
 		}
 		if (isStamp)
 		{
@@ -242,11 +260,11 @@ public class TreeNodeArea {
 			}
 			return;
 		}
-		for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor((xPos+width)*world.getWidth()); x++)
+		for (int x = minX; x < maxX; x++)
 		{
-			for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor((yPos+height)*world.getHeight()); y++)
+			for (int y = minY; y < maxY; y++)
 			{
-				for (int z = (int) Math.floor(zPos*world.getDepth()); z < (int) Math.floor((zPos+depth)*world.getDepth()); z++)
+				for (int z = minZ; z < maxZ; z++)
 				{
 					determineValue(rng,world,x,y,z);
 				}

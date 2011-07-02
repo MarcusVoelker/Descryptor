@@ -1,8 +1,7 @@
 Modifier Perlin {
+	ModType = WeightedPerlin
 	scale = 16;
-	Prob 1 = 2
-	Type 1 = Earth
-	Prob 2 = 1
+	Type 1 = None
 	Type 2 = Stone
 }
 
@@ -21,6 +20,6 @@ Area World {
 }
 
 Area PArea {
-	Type = None
+	Type = Earth
 	Modifier Perlin	
 }
