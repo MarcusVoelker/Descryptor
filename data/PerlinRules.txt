@@ -3,6 +3,7 @@ Modifier Perlin {
 	scale = 16;
 	Type 1 = None
 	Type 2 = Stone
+	Type 3 = Test
 }
 
 Area World {

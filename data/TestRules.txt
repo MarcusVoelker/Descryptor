@@ -65,7 +65,7 @@ Area Surface {
 }
 Area Sky {
 	Type = None
-	
+	/*
 	SubArea {
 		AreaType = Blob
 		count = 1000;
@@ -74,7 +74,7 @@ Area Sky {
 		yPos = 0.45+0.5*cos(rand);
 		width = 0.1;
 		height = 0.1;
-	}
+	}*/
 	
 	SubArea {
 		AreaType = Tower
