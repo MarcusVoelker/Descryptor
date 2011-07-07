@@ -25,13 +25,14 @@ public class WeightedPerlinModifier extends PerlinModifier{
 			}
 		}
 		double noiseValue = perlin.noise(x, y, z, (Integer) resolver.getVariable("scale"));
-		for (int i = 0; i < typeIDs.size();i++)
+		int typeCount = typeIDs.size();
+		for (int i = 0; i < typeCount-1; i++)
 		{
-			float percentage = (float) i/typeIDs.size()+2*((float) y - minY)/((maxY-minY)*typeIDs.size());
+			float percentage = (i/(float) typeCount)+2*(((float) y - minY)/(maxY-minY))/typeCount;
 			if (noiseValue < percentage)
 				return typeIDs.get(i+1);
 		}
-		return 0;
+		return typeIDs.get(typeCount);
 	}
 	
 	@Override
