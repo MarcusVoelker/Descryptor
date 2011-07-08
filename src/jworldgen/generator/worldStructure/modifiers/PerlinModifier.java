@@ -15,7 +15,7 @@ public class PerlinModifier extends Modifier {
 	protected Hashtable<Integer,Integer> typeIDs;
 	protected PerlinGenerator perlin;
 	
-	int probSum;
+	protected int probSum;
 	
 	public PerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments)
 	{

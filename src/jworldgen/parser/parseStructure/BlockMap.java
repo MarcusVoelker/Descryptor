@@ -11,6 +11,7 @@ public class BlockMap {
 		blockMap = new Hashtable<String,Integer>();
 		maxID = 0;
 		blockMap.put("None", 0);
+		blockMap.put("Empty", -1);
 	}
 	
 	public int registerBlock(String key)

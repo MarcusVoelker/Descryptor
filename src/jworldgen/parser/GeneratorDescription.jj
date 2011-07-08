@@ -1,6 +1,14 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
- */options{  JDK_VERSION = "1.5";  static = true;}PARSER_BEGIN(RuleParser)package jworldgen.parser;
+ */
+options
+{
+  JDK_VERSION = "1.5";
+  static = true;
+}
+
+PARSER_BEGIN(RuleParser)
+package jworldgen.parser;
 
 import java.io.StringReader;
 import java.util.Stack;
@@ -10,24 +18,61 @@ import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.exceptionHandler.CriticalFailure;
 
-public class RuleParser{  public static ParseList parse(String ruleCode) throws CriticalFailure  {
-    StringReader reader = new StringReader(ruleCode);    RuleParser parser = new RuleParser(reader);
-        ExceptionLogger.log("Reading input...", LoggerLevel.COARSE);    try    {      ParseList list = RuleParser.parseRoot();
+public class RuleParser
+{
+  public static ParseList parse(String ruleCode) throws CriticalFailure
+  {
+    StringReader reader = new StringReader(ruleCode);
+    RuleParser parser = new RuleParser(reader);
+    
+    ExceptionLogger.log("Reading input...", LoggerLevel.COARSE);
+    try
+    {
+      ParseList list = RuleParser.parseRoot();
       ExceptionLogger.log("No syntactic errors detected", LoggerLevel.COARSE);
-      return list;    }    catch (Exception e)    {      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
-      return null;    }    catch (Error e)    {      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
-      return null;    }  }}PARSER_END(RuleParser)SKIP :{  " "| "\r"| "\t"| "\n"
-| "/*": IN_COMMENT}
+      return list;
+    }
+    catch (Exception e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+    catch (Error e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+  }
+}
 
-< IN_COMMENT > SKIP:{
-  < ~[] >}
+PARSER_END(RuleParser)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| "/*": IN_COMMENT
+}
+
+< IN_COMMENT > SKIP:
+{
+  < ~[] >
+}
+
 < IN_COMMENT > SKIP :
 {
   "*/": DEFAULT
 }
-TOKEN : /* Partitions */{  < AREA : "Area" >| < SUBAREA : "SubArea" >
+
+TOKEN : /* Partitions */
+{
+  < AREA : "Area" >
+| < SUBAREA : "SubArea" >
 | < STAMP : "Stamp" >
-| < MODIFIER : "Modifier" >}
+| < MODIFIER : "Modifier" >
+}
 
 TOKEN : /* Room Keys */
 {
@@ -56,24 +101,38 @@ TOKEN: /* ALE Operators */
 | < MINUS : "-" >
 | < MULTIPLY : "*" >
 | < DIVIDE : "/" >
-| < RANDOM : ":" >}
+| < RANDOM : ":" >
+}
 
 TOKEN: /* ALE Functions */
-{  < SIN: "sin" >
+{
+  < SIN: "sin" >
 | < COS: "cos" >
 | < TAN: "tan" >
-}TOKEN : /* Misc Identifiers */{  < INTEGER : (< MINUS >)? (< DIGIT >)+ >| < #DIGIT : [ "0"-"9" ] >
-| < IDENT : ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
+}
+TOKEN : /* Misc Identifiers */
+{
+  < SPECIAL : "$" >
+| < INTEGER : (< MINUS >)? (< DIGIT >)+ >
+| < #DIGIT : [ "0"-"9" ] >
+| < IDENT : (< SPECIAL >)? ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
 | < FLOAT : < INTEGER > "." < INTEGER > >
-| < EOL : ";" >}
+| < EOL : ";" >
+}
 
 ParseList parseRoot():
 {ParseList list = new ParseList();}
-{	partition(list)
+{
+	partition(list)
 	{
-	  return list;	}
+	  return list;
+	}
 }
-void partition(ParseList list) :{ParseArea area; ParseModifier modifier;}{  area = area() partition(list)
+
+void partition(ParseList list) :
+{ParseArea area; ParseModifier modifier;}
+{
+  area = area() partition(list)
   {
     list.addArea(area);
   }
@@ -81,7 +140,8 @@ ParseList parseRoot():
   {
     list.addModifier(modifier);
   }
-| < EOF >}
+| < EOF >
+}
 
 void areaLine(ParseArea area) :
 {Token probType; Token modType;}
@@ -91,7 +151,8 @@ void areaLine(ParseArea area) :
     area.setType(probType.image);
   }
 | < MODIFIER > modType = < IDENT >
-  {	area.addModifier(modType.image);
+  {
+	area.addModifier(modType.image);
   }  
 }
 
@@ -99,10 +160,18 @@ void modifierLine(ParseModifier modifier) :
 {Token probType; Token id; ParseAssignment assignment;}
 {
   
-  < TYPE > id = < INTEGER > "=" probType = < IDENT >
-  {
-    modifier.addType(probType.image, Integer.parseInt(id.image));
-  }
+  < TYPE > 
+  (
+    id = < INTEGER > "=" probType = < IDENT >
+    {
+      modifier.addType(probType.image, Integer.parseInt(id.image));
+    }
+  |
+  	"=" probType = < IDENT >
+  	{
+      modifier.addType(probType.image, 0);
+    }
+  )  
 | < PROB > id = < INTEGER > "=" probType = < INTEGER >
   {
     modifier.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
@@ -122,7 +191,8 @@ void subAreaLine(ParseSubArea subArea) :
 {
   < ATYPE > "=" identifier = < IDENT >
   {
-    subArea.areaType = identifier.image;  }
+    subArea.areaType = identifier.image;
+  }
 | < RTYPE > "=" identifier = < IDENT >
   {
     subArea.areaType = identifier.image;
@@ -154,8 +224,10 @@ void subArea(ParseArea area):
 {ParseSubArea subArea = new ParseSubArea(); subArea.isStamp = false;}
 {
   < SUBAREA > "{" (subAreaLine(subArea))* "}"
-  {	area.addSubArea(subArea);
-  }}
+  {
+	area.addSubArea(subArea);
+  }
+}
 
 void stamp(ParseArea area):
 {ParseSubArea subArea = new ParseSubArea(); subArea.isStamp = true;}
@@ -169,9 +241,11 @@ void stamp(ParseArea area):
 
 ParseArea area():
 {ParseArea area = new ParseArea(); Token ident;}
-{  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area) | stamp(area))* "}"
+{
+  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area) | stamp(area))* "}"
   {
-    area.setIdentifier(ident.image);	return area;
+    area.setIdentifier(ident.image);
+	return area;
   }
 }
 
@@ -185,64 +259,23 @@ ParseModifier modifier():
   }
 }
 
-int[] combExp():
-{int leftVal; int rightVal;}
-{	leftVal = intValExp() ":" rightVal = intValExp()
-	{
-	  return new int[]{leftVal,rightVal};	}
-}
-
-int intValExp():
-{Token t;}{	t = < INTEGER >
-	{		return Integer.parseInt(t.image);
-	}
-|   t = "$n"
-	{		return -1;
-	}
-|   t = "$i"
-	{
-		return -2;
-	}
-}
-
-float floatValExp():
-{Token t;}
-{
-	t = < FLOAT >
-	{
-		return Float.parseFloat(t.image);
-	}
-|   t = "$n"
-	{
-		return -1;
-	}
-|   t = "$i"
-	{
-		return -2;
-	}
-}
-
-float[] probExp():
-{float leftVal; float rightVal;}
-{
-	leftVal = floatValExp() ":" rightVal = floatValExp()
-	{		return new float[]{leftVal,rightVal};
-	}	  
-}
-
 int prob():
 {Token id;}
-{	< PROB > id = < INTEGER >
-	{		return Integer.parseInt(id.image);
+{
+	< PROB > id = < INTEGER >
+	{
+		return Integer.parseInt(id.image);
 	}	
 }
 
 int type():
-{Token id;}{
+{Token id;}
+{
   < TYPE > id = < INTEGER >
 	{
 		return Integer.parseInt(id.image);
-	}}
+	}
+}
 
 ParseAssignment assignment():
 {Token t; ParseALE ale;}
@@ -250,21 +283,26 @@ ParseAssignment assignment():
   t = < IDENT > "=" ale = ale()
   {
     return new ParseAssignment(t.image,ale);
-  }}
+  }
+}
 ParseALE ale():
 {LinkedList<ALEQueueElement> output = new LinkedList(); Stack opStack = new Stack();}
 {
   aleShunt(output,opStack)
   {
     while (!opStack.empty())
-    {		output.add((ALEQueueElement) opStack.pop());
-    }    return new ParseALE(output);
-  }}
+    {
+		output.add((ALEQueueElement) opStack.pop());
+    }
+    return new ParseALE(output);
+  }
+}
 
 void aleShunt(LinkedList<ALEQueueElement>  output, Stack opStack):
 {}
 {
- 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleFunction(opStack) | aleLeaf(output))* < EOL > }
+ 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleFunction(opStack) | aleLeaf(output))* < EOL > 
+}
 
 void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 {Token t;}
@@ -292,14 +330,17 @@ void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 
 void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 {Token t; ALEElementType type;}
-{	(
+{
+	(
 	  t = < PLUS > { type = ALEElementType.PLUS; }
 	|
 	  t = < MINUS > { type = ALEElementType.MINUS; }
 	)
-	{		while (!opStack.empty())
+	{
+		while (!opStack.empty())
 		{
-		  output.add((ALEQueueElement) opStack.pop());		}
+		  output.add((ALEQueueElement) opStack.pop());
+		}
 		opStack.push(new ALEQueueElement(t.image,type));
 	}
 
@@ -308,8 +349,10 @@ void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 	|
 	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
 	)
-	{		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
-		{			output.add((ALEQueueElement) opStack.pop());
+	{
+		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
+		{
+			output.add((ALEQueueElement) opStack.pop());
 		}
 		opStack.push(new ALEQueueElement(t.image,type));
 	}
@@ -349,6 +392,8 @@ void aleLeaf(LinkedList<ALEQueueElement> output):
   	  t = < INTEGER > { type = ALEElementType.INTEGER; }
   	)
   	{
-  	  output.add(new ALEQueueElement(t.image,type));  	}
+  	  output.add(new ALEQueueElement(t.image,type));
+  	}
 }
-  
+
+  

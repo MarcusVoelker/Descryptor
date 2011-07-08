@@ -9,6 +9,7 @@ import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 import jworldgen.generator.World;
+import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
@@ -133,6 +134,8 @@ public class TreeNodeArea {
 	protected  int calculateCount(RNG rng)
 	{
 		VariableResolver resolver = new VariableResolver();
+		resolver.setVariable("$i", 0);
+		resolver.setVariable("$n", 0);
 		if (assignments != null)
 		{
 			for (ParseAssignment assignment : assignments)
@@ -174,6 +177,8 @@ public class TreeNodeArea {
 	{
 		ExceptionLogger.log("Expanding Area \""+identifier+"\"", LoggerLevel.FINEST);
 		VariableResolver resolver = new VariableResolver();
+		resolver.setVariable("$i", index);
+		resolver.setVariable("$n", subCount);
 		if (assignments != null)
 		{
 			for (ParseAssignment assignment : assignments)
@@ -243,6 +248,10 @@ public class TreeNodeArea {
 			case WEIGHTED_PERLIN:
 				((WeightedPerlinModifier) mod).setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
 				mod.setLocation(minX, minY, minZ, maxX, maxY, maxZ);
+				break;
+			case METABALL:
+				mod.setRNG(rng);
+				((MetaballModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
 				break;
 			}
 		}

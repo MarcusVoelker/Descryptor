@@ -86,9 +86,9 @@ public class ALEQueueElement {
 	{
 		if ((v1 instanceof Integer) && (v2 instanceof Integer))
 		{
-				return toInt((Integer) v1,(Integer) v2, rng);
+				return toInt(v1.intValue(),v2.intValue(), rng);
 		} else {
-				return toFloat((Float) v1,(Float) v2, rng);
+				return toFloat(v1.floatValue(),v2.floatValue(), rng);
 		}
 	}
 }

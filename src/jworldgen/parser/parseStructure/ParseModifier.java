@@ -69,7 +69,7 @@ public class ParseModifier {
 		if (type.equals("Perlin"))
 			return new PerlinModifier(probabilities,typeIDs,identifier,assignments);
 		if (type.equals("WeightedPerlin"))
-			return new WeightedPerlinModifier(typeIDs,identifier,assignments);
+			return new WeightedPerlinModifier(probabilities,typeIDs,identifier,assignments);
 		try {
 			ExceptionLogger.logException(new IllegalModifierType(type), LoggerLevel.ERROR);
 		} catch (CriticalFailure e) {

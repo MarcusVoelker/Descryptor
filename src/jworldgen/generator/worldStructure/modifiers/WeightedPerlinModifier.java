@@ -8,14 +8,12 @@ import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class WeightedPerlinModifier extends PerlinModifier{
 	
-	public WeightedPerlinModifier(Hashtable<Integer, Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments) 
+	float heightWeight;
+	int scale;
+	public WeightedPerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer, Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments) 
 	{
-		super(new Hashtable<Integer, Integer>(), typeIDs, identifier, assignments);
+		super(probabilities, typeIDs, identifier, assignments);
 		this.type = ModifierType.WEIGHTED_PERLIN;
-	}
-
-	@Override
-	public int getValue(int x, int y, int z) {
 		VariableResolver resolver = new VariableResolver();
 		if (assignments != null)
 		{
@@ -24,19 +22,37 @@ public class WeightedPerlinModifier extends PerlinModifier{
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		double noiseValue = perlin.noise(x, y, z, (Integer) resolver.getVariable("scale"));
+		this.scale = (Integer) resolver.getVariable("scale");
+		this.heightWeight = (Float) resolver.getVariable("heightWeight");
+	}
+
+	@Override
+	public int getValue(int x, int y, int z) {
+		
+		double noiseValue = perlin.noise(x, y, z, scale);
 		int typeCount = typeIDs.size();
-		for (int i = 0; i < typeCount-1; i++)
+		for (int i = 0; i < probSum-1; i++)
 		{
-			float percentage = (i/(float) typeCount)+2*(((float) y - minY)/(maxY-minY))/typeCount;
-			if (noiseValue < percentage)
-				return typeIDs.get(i+1);
+			float percentage = (i/(float) probSum)+2*((maxY - (float) y)/(maxY-minY))/probSum;
+			if ((noiseValue+heightWeight*((float) y - minY)/(maxY-minY))/(heightWeight+1) < percentage)
+			{
+				int ctr = 1;
+				for (int key = 1; key <= typeCount; key++)
+				{
+					i -= probabilities.get(key);
+					if (i < 0)
+					{
+						return typeIDs.get(ctr);
+					}
+					ctr++;
+				}
+			}
 		}
 		return typeIDs.get(typeCount);
 	}
 	
 	@Override
 	public Modifier clone() {
-		return new WeightedPerlinModifier(typeIDs, identifier, assignments);
+		return new WeightedPerlinModifier(probabilities, typeIDs, identifier, assignments);
 	}
 }
