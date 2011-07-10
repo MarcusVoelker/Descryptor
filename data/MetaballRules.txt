@@ -1,0 +1,25 @@
+Modifier Metaball {
+	ModType = Metaball
+	count = 100;
+	threshold = 0.8;
+	Type = Stone
+}
+
+Area World {
+	Type = None
+	SubArea {
+		AreaType = MArea
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.0;
+		zPos = 0.0;
+		width = 1.0;
+		height = 1.0;
+		depth = 1.0;
+	}
+}
+
+Area MArea {
+	Type = None
+	Modifier Metaball	
+}
