@@ -12,6 +12,9 @@ public class BlockMap {
 		maxID = 0;
 		blockMap.put("None", 0);
 		blockMap.put("Empty", -1);
+		blockMap.put("Erase", -2);
+		blockMap.put("Lock", -3);
+		blockMap.put("Unlock", -4);
 	}
 	
 	public int registerBlock(String key)

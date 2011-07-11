@@ -6,8 +6,11 @@ import java.util.Hashtable;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
+import jworldgen.exceptionHandler.IllegalChangeType;
 import jworldgen.exceptionHandler.IllegalModifierType;
 import jworldgen.exceptionHandler.LoggerLevel;
+import jworldgen.generator.worldStructure.modifiers.ChangeType;
+import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
@@ -21,6 +24,7 @@ public class ParseModifier {
 	
 	private String identifier;
 	private String type;
+	private String changeType;
 	
 	public ParseModifier()
 	{
@@ -54,6 +58,11 @@ public class ParseModifier {
 		this.type = type;
 	}
 	
+	public void setChangeType(String changeType)
+	{
+		this.changeType = changeType;
+	}
+	
 	public void insertBlockIDs(BlockMap blockmap)
 	{
 		for (Enumeration<Integer> e = types.keys(); e.hasMoreElements();)
@@ -66,10 +75,27 @@ public class ParseModifier {
 	
 	public Modifier toModifier()
 	{
+		ChangeType chType;
+		if (changeType.equals("Modify"))
+			chType = ChangeType.MODIFY;
+		else if (changeType.equals("Stack"))
+			chType = ChangeType.STACK;
+		else {
+			try {
+				ExceptionLogger.logException(new IllegalChangeType(type), LoggerLevel.ERROR);
+			} catch (CriticalFailure e) {
+				//Should not be reachable
+			} finally {
+				chType = ChangeType.MODIFY;
+			}
+		}
+			
 		if (type.equals("Perlin"))
-			return new PerlinModifier(probabilities,typeIDs,identifier,assignments);
+			return new PerlinModifier(probabilities,typeIDs,identifier,assignments,chType);
 		if (type.equals("WeightedPerlin"))
-			return new WeightedPerlinModifier(probabilities,typeIDs,identifier,assignments);
+			return new WeightedPerlinModifier(probabilities,typeIDs,identifier,assignments,chType);
+		if (type.equals("Metaball"))
+			return new MetaballModifier(typeIDs.get(0),identifier,assignments,chType);
 		try {
 			ExceptionLogger.logException(new IllegalModifierType(type), LoggerLevel.ERROR);
 		} catch (CriticalFailure e) {

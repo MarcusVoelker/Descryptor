@@ -10,9 +10,9 @@ public class WeightedPerlinModifier extends PerlinModifier{
 	
 	float heightWeight;
 	int scale;
-	public WeightedPerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer, Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments) 
+	public WeightedPerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer, Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType) 
 	{
-		super(probabilities, typeIDs, identifier, assignments);
+		super(probabilities, typeIDs, identifier, assignments, chType);
 		this.type = ModifierType.WEIGHTED_PERLIN;
 		VariableResolver resolver = new VariableResolver();
 		if (assignments != null)
@@ -53,6 +53,6 @@ public class WeightedPerlinModifier extends PerlinModifier{
 	
 	@Override
 	public Modifier clone() {
-		return new WeightedPerlinModifier(probabilities, typeIDs, identifier, assignments);
+		return new WeightedPerlinModifier(probabilities, typeIDs, identifier, assignments, chType);
 	}
 }

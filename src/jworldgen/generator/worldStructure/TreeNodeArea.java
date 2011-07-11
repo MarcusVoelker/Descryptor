@@ -37,6 +37,13 @@ public class TreeNodeArea {
 	
 	protected boolean isStamp = false;
 	
+	protected int minX;
+	protected int minY;
+	protected int minZ;
+	protected int maxX;
+	protected int maxY;
+	protected int maxZ;
+	
 	public TreeNodeArea()
 	{
 		subAreas = new ArrayList<TreeNodeArea>();
@@ -218,25 +225,42 @@ public class TreeNodeArea {
 	
 	private void determineValue(RNG rng, World world, int x, int y, int z)
 	{
-		if (tileID != 0)
-			world.setValue(x, y, z, tileID);
+		world.setValue(x, y, z, tileID);
 		for (Modifier mod : modifiers)
 		{
 			int value = mod.getValue(x, y, z);
-			if (value != 0)
+			switch(mod.getChangeType())
 			{
+			case MODIFY:
+				world.replaceValue(x, y, z, value);
+			case STACK:
 				world.setValue(x, y, z, value);
 			}
 		}
 	}
 	public void fillWorld(RNG rng, World world)
 	{
-		int minX = (int) Math.floor(xPos*world.getWidth());
-		int minY = (int) Math.floor(yPos*world.getHeight());
-		int minZ = (int) Math.floor(zPos*world.getDepth());
-		int maxX = (int) Math.floor((xPos+width)*world.getWidth());
-		int maxY = (int) Math.floor((yPos+height)*world.getHeight());
-		int maxZ = (int) Math.floor((zPos+depth)*world.getDepth());
+		prepareForFilling(rng, world);
+		for (int x = minX; x < maxX; x++)
+		{
+			for (int y = minY; y < maxY; y++)
+			{
+				for (int z = minZ; z < maxZ; z++)
+				{
+					setValue(rng,world,x,y,z);
+				}
+			}
+		}
+	}
+	
+	public void prepareForFilling(RNG rng, World world)
+	{
+		minX = (int) Math.floor(xPos*world.getWidth());
+		minY = (int) Math.floor(yPos*world.getHeight());
+		minZ = (int) Math.floor(zPos*world.getDepth());
+		maxX = (int) Math.floor((xPos+width)*world.getWidth());
+		maxY = (int) Math.floor((yPos+height)*world.getHeight());
+		maxZ = (int) Math.floor((zPos+depth)*world.getDepth());
 		for (Modifier mod : modifiers)
 		{
 			switch(mod.getType())
@@ -255,34 +279,19 @@ public class TreeNodeArea {
 				break;
 			}
 		}
-		if (isStamp)
-		{
-			for (int x = (int) Math.floor(xPos*world.getWidth()); x < (int) Math.floor(xPos*world.getWidth()+width); x++)
-			{
-				for (int y = (int) Math.floor(yPos*world.getHeight()); y < (int) Math.floor(yPos*world.getHeight()+height); y++)
-				{			
-					for (int z = (int) Math.floor(zPos*world.getDepth()); z < (int) Math.floor(zPos*world.getDepth()+depth); z++)
-					{			
-						determineValue(rng,world,x,y,z);
-					}
-				}
-			}
-			return;
-		}
-		for (int x = minX; x < maxX; x++)
-		{
-			for (int y = minY; y < maxY; y++)
-			{
-				for (int z = minZ; z < maxZ; z++)
-				{
-					determineValue(rng,world,x,y,z);
-				}
-			}
-		}
-		
 		for (TreeNodeArea tna: subAreas)
 		{
-			tna.fillWorld(rng, world);
+			tna.prepareForFilling(rng, world);
+		}
+	}
+	
+	public void setValue(RNG rng, World world, int x, int y, int z)
+	{
+		if (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ)
+			determineValue(rng,world,x,y,z);
+		for (TreeNodeArea tna: subAreas)
+		{
+			tna.setValue(rng, world, x, y, z);
 		}
 	}
 	

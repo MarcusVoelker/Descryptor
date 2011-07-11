@@ -14,9 +14,9 @@ public class MetaballModifier extends Modifier {
 	protected ArrayList<Integer> yPos;
 	protected ArrayList<Integer> zPos;
 	
-	public MetaballModifier(int typeID, String identifier, ArrayList<ParseAssignment> assignments)
+	public MetaballModifier(int typeID, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
 	{
-		super(identifier, assignments);
+		super(identifier, assignments, chType);
 		this.type = ModifierType.METABALL;
 		this.identifier = identifier;
 		this.assignments = assignments;
@@ -33,7 +33,7 @@ public class MetaballModifier extends Modifier {
 	}
 	@Override
 	public Modifier clone() {
-		return new MetaballModifier(typeID, identifier, assignments);
+		return new MetaballModifier(typeID, identifier, assignments, chType);
 	}
 
 	@Override

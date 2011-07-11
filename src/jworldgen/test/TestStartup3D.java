@@ -62,7 +62,7 @@ public class TestStartup3D {
 		try {
 			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
-			World world = Generator.generateFromFile("data/TestRules.txt", 80, 80, 80);
+			World world = Generator.generateFromFile("data/TestRules.txt", 512, 512, 512);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GLU.gluPerspective(45.0f, 1.0f, 0.5f, 400.0f);

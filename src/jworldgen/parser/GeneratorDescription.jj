@@ -87,6 +87,7 @@ TOKEN : /* Modifier and Area Keys */
   < PROB : "Prob" >
 | < TYPE : "Type" >
 | < MODTYPE : "ModType" >
+| < CHANGETYPE : "ChangeType" >
 }
 
 TOKEN : /* SubArea Keys */
@@ -179,6 +180,10 @@ void modifierLine(ParseModifier modifier) :
 | < MODTYPE > "=" probType = < IDENT >
   {
     modifier.setType(probType.image);
+  }
+| < CHANGETYPE > "=" probType = < IDENT >
+  {
+    modifier.setChangeType(probType.image);
   }
 | assignment = assignment()
   {

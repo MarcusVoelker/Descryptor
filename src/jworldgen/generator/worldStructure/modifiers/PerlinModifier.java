@@ -17,9 +17,9 @@ public class PerlinModifier extends Modifier {
 	
 	protected int probSum;
 	
-	public PerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments)
+	public PerlinModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
 	{
-		super(identifier, assignments);
+		super(identifier, assignments, chType);
 		this.type = ModifierType.PERLIN;
 		this.probabilities = probabilities;
 		this.typeIDs = typeIDs;
@@ -62,6 +62,6 @@ public class PerlinModifier extends Modifier {
 	}
 
 	public Modifier clone() {
-		return new PerlinModifier(probabilities, typeIDs, identifier, assignments);
+		return new PerlinModifier(probabilities, typeIDs, identifier, assignments, chType);
 	}
 }

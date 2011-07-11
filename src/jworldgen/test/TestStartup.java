@@ -35,9 +35,9 @@ public class TestStartup {
 	public static void main(String[] args)
 	{
 		try {
-			Display.setDisplayMode(new DisplayMode(800,800));
+			Display.setDisplayMode(new DisplayMode(1024,1024));
 			Display.create();
-			World world = Generator.generateFromFile("data/TestRules.txt", 400, 400, 1);
+			World world = Generator.generateFromFile("data/TestRules.txt", 1024, 1024, 1);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);

@@ -1,16 +1,18 @@
 Modifier Stone {
 	ModType = Perlin
+	ChangeType = Modify
 	scale = 128;
 	Prob 1 = 1
 	Type 1 = Stone
 	Prob 2 = 1
-	Type 2 = None	
+	Type 2 = None
 	Prob 3 = 1
 	Type 3 = CrackedStone
 }
 
 Modifier Iron {
 	ModType = Perlin
+	ChangeType = Modify
 	scale = 32;
 	Prob 1 = 2
 	Type 1 = None	
@@ -20,6 +22,7 @@ Modifier Iron {
 
 Modifier Gold {
 	ModType = Perlin
+	ChangeType = Modify
 	scale = 16;
 	Prob 1 = 5
 	Type 1 = None	
@@ -29,10 +32,11 @@ Modifier Gold {
 
 Modifier SurMod {
 	ModType = WeightedPerlin
+	ChangeType = Stack
 	scale = 16;
 	heightWeight = 4.0;
 	Prob 1 = 1
-	Type 1 = Empty
+	Type 1 = Erase
 	Prob 2 = 1
 	Type 2 = Sand
 	Prob 3 = 10

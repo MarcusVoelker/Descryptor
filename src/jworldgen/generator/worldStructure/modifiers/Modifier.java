@@ -14,10 +14,13 @@ public abstract class Modifier {
 	
 	protected ArrayList<ParseAssignment> assignments;
 	
-	public Modifier(String identifier, ArrayList<ParseAssignment> assignments)
+	protected ChangeType chType;
+	
+	public Modifier(String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
 	{
 		this.identifier = identifier;
 		this.assignments = assignments;
+		this.chType = chType;
 	}
 	
 	public void setRNG(RNG rng)
@@ -42,5 +45,10 @@ public abstract class Modifier {
 	public ModifierType getType()
 	{
 		return type;
+	}
+	
+	public ChangeType getChangeType()
+	{
+		return chType;
 	}
 }
