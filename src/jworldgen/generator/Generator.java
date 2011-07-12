@@ -13,9 +13,12 @@ public class Generator {
 	
 	private Ruleset rules;
 	private RNG randomNumberGenerator;
-	public Generator (Ruleset rules)
+	private TreeNodeArea world;
+	private long seed;
+	public Generator (Ruleset rules, long seed)
 	{
 		this.rules = rules;
+		this.seed = seed;
 	}
 	
 	public World generateRandomly(int width, int height, int depth)
@@ -23,7 +26,7 @@ public class Generator {
 		this.randomNumberGenerator = new RNG();
 		TreeNodeArea world = rules.getWorld();
 		World blockWorld = new World(width,height,depth);
-		world.fillWorld(randomNumberGenerator,blockWorld);
+		world.fillWorld(randomNumberGenerator.nextInt(0, Integer.MAX_VALUE),blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}
@@ -33,18 +36,40 @@ public class Generator {
 		this.randomNumberGenerator = new RNG(seed);
 		TreeNodeArea world = rules.getWorld();
 		World blockWorld = new World(width,height,depth);
-		world.fillWorld(randomNumberGenerator,blockWorld);
+		world.fillWorld(seed,blockWorld);
 		ExceptionLogger.log("World successfully filled", LoggerLevel.COARSE);
 		return blockWorld;
 	}
 	
+	public void calculateBlock(World world, int x, int y, int z)
+	{
+		world.initValue(x, y, z);
+		this.world.setValue(new RNG(seed,x,y,z), world, x, y, z);
+	}
+	
+	public World createWorld(int width, int height, int depth)
+	{
+		world = rules.getWorld();
+		World blockWorld = new World(width,height,depth);
+		world.prepareForFilling(new RNG(seed), blockWorld);
+		return blockWorld;
+	}
+	
+	public static Generator getGeneratorFromFile(String fileName, long seed) throws CriticalFailure
+	{
+		String input = TextFileReader.readTextFile(fileName);
+		ParseList list = RuleParser.parse(input);
+		Ruleset rules = new Ruleset(list);
+		rules.expandToWorldTree(new RNG(seed));
+		return new Generator(rules,seed);
+	}
 	public static World generateFromFile(String fileName, long seed, int width, int height, int depth) throws CriticalFailure
 	{
 		String input = TextFileReader.readTextFile(fileName);
 		ParseList list = RuleParser.parse(input);
 		Ruleset rules = new Ruleset(list);
 		rules.expandToWorldTree(new RNG(seed));
-		Generator gen = new Generator(rules);
+		Generator gen = new Generator(rules,seed);
 		World world = gen.generateFromSeed(seed, width, height, depth);
 		return world;
 	}
@@ -55,7 +80,7 @@ public class Generator {
 		ParseList list = RuleParser.parse(input);
 		Ruleset rules = new Ruleset(list);
 		rules.expandToWorldTree(new RNG());
-		Generator gen = new Generator(rules);
+		Generator gen = new Generator(rules, new RNG().nextInt(0, Integer.MAX_VALUE));
 		World world = gen.generateRandomly(width, height, depth);
 		return world;
 	}

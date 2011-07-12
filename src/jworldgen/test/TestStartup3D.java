@@ -62,7 +62,7 @@ public class TestStartup3D {
 		try {
 			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
-			World world = Generator.generateFromFile("data/TestRules.txt", 512, 512, 512);
+			World world = Generator.generateFromFile("data/TestRules.txt", 40, 40, 40);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GLU.gluPerspective(45.0f, 1.0f, 0.5f, 400.0f);
@@ -73,7 +73,7 @@ public class TestStartup3D {
 			{
 				// Clear the screen and depth buffer
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-				GL11.glTranslatef(0, 0, -3*world.getDepth());
+				GL11.glTranslatef(0, -15, -3*world.getDepth());
 				GL11.glRotatef(angle, 0, 1, 0);
 				GL11.glTranslatef(-0.5f*world.getWidth(), 0.5f*world.getHeight(),0);
 				for (int k = cuttingDepth; k < world.getDepth() - cuttingDepth; k++)
@@ -89,7 +89,49 @@ public class TestStartup3D {
 							{
 								GL11.glTranslatef(0.0f, -j, 0.0f);
 								setColor(color,0.5f,color/10.0f,10);
-								
+								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+								// draw quad
+								glEnable( GL11.GL_POLYGON_OFFSET_FILL );
+								GL11.glPolygonOffset( 1, 1 );
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,0,0);
+								    GL11.glVertex3f(0,1,0);
+								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(1,0,0);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,1,1);
+								    GL11.glVertex3f(1,1,1);
+								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(0,1,0);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,1,0);
+								    GL11.glVertex3f(0,1,1);
+								    GL11.glVertex3f(0,0,1);
+								    GL11.glVertex3f(0,0,0);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,0,1);
+								    GL11.glVertex3f(0,1,1);
+								    GL11.glVertex3f(1,1,1);
+								    GL11.glVertex3f(1,0,1);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,0,1);
+								    GL11.glVertex3f(1,0,1);
+								    GL11.glVertex3f(1,0,0);
+								    GL11.glVertex3f(0,0,0);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(1,1,1);
+								    GL11.glVertex3f(1,0,1);
+								    GL11.glVertex3f(1,0,0);
+								GL11.glEnd();
+								GL11.glDisable( GL11.GL_POLYGON_OFFSET_FILL );
+								GL11.glColor3f(0.05f,0.05f,0.05f);
+								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 								// draw quad
 								GL11.glBegin(GL11.GL_QUADS);
 								    GL11.glVertex3f(0,0,0);
@@ -109,6 +151,24 @@ public class TestStartup3D {
 								    GL11.glVertex3f(0,0,1);
 								    GL11.glVertex3f(0,0,0);
 								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,0,1);
+								    GL11.glVertex3f(0,1,1);
+								    GL11.glVertex3f(1,1,1);
+								    GL11.glVertex3f(1,0,1);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(0,0,1);
+								    GL11.glVertex3f(1,0,1);
+								    GL11.glVertex3f(1,0,0);
+								    GL11.glVertex3f(0,0,0);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_QUADS);
+								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(1,1,1);
+								    GL11.glVertex3f(1,0,1);
+								    GL11.glVertex3f(1,0,0);
+								GL11.glEnd();
 								GL11.glTranslatef(0.0f, j, 0.0f);
 							}
 						}
@@ -119,7 +179,7 @@ public class TestStartup3D {
 				Display.update();
 				GL11.glTranslatef(0.5f*world.getWidth(), -0.5f*world.getHeight(),0);
 				GL11.glRotatef(angle, 0, -1, 0);
-				GL11.glTranslatef(0, 0, 3*world.getDepth());
+				GL11.glTranslatef(0, 15, 3*world.getDepth());
 				angle += 1f;
 				boolean leftPressed   = hasInput(Keyboard.KEY_LEFT);
 				boolean rightPressed   = hasInput(Keyboard.KEY_RIGHT);

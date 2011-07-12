@@ -1,0 +1,14 @@
+Modifier Voronoi {
+	ModType = Voronoi
+	ChangeType = Modify
+	count = 10;
+	Prob 1 = 1
+	Type 1 = Type1
+	Prob 2 = 5
+	Type 2 = None
+}
+
+Area World {
+	Type = None
+	Modifier Voronoi
+}

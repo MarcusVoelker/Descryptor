@@ -13,6 +13,7 @@ import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
+import jworldgen.generator.worldStructure.modifiers.VoronoiModifier;
 import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
@@ -192,18 +193,18 @@ public class TreeNodeArea {
 			{
 				assignment.evaluate(rng, resolver);
 			}
-			xPos = ((Float) resolver.getVariable("xPos"))*parentWidth+parentXPos;
-			yPos = ((Float) resolver.getVariable("yPos"))*parentHeight+parentYPos;
+			xPos = (resolver.getVariable("xPos").floatValue())*parentWidth+parentXPos;
+			yPos = (resolver.getVariable("yPos").floatValue())*parentHeight+parentYPos;
 			if (resolver.isDefined("zPos"))
-				zPos = ((Float) resolver.getVariable("zPos"))*parentDepth+parentZPos;
+				zPos = (resolver.getVariable("zPos").floatValue())*parentDepth+parentZPos;
 			else
 				zPos = 0.0f;
 			if (!isStamp)
 			{
-				width = ((Float) resolver.getVariable("width"))*parentWidth;
-				height = ((Float) resolver.getVariable("height"))*parentHeight;
+				width = (resolver.getVariable("width").floatValue())*parentWidth;
+				height = (resolver.getVariable("height").floatValue())*parentHeight;
 				if (resolver.isDefined("depth"))
-					depth = ((Float) resolver.getVariable("depth"))*parentDepth;
+					depth = (resolver.getVariable("depth").floatValue())*parentDepth;
 				else
 					depth = 1.0f;
 			}
@@ -233,21 +234,23 @@ public class TreeNodeArea {
 			{
 			case MODIFY:
 				world.replaceValue(x, y, z, value);
+				break;
 			case STACK:
 				world.setValue(x, y, z, value);
+				break;
 			}
 		}
 	}
-	public void fillWorld(RNG rng, World world)
+	public void fillWorld(long seed, World world)
 	{
-		prepareForFilling(rng, world);
+		prepareForFilling(new RNG(seed), world);
 		for (int x = minX; x < maxX; x++)
 		{
 			for (int y = minY; y < maxY; y++)
 			{
 				for (int z = minZ; z < maxZ; z++)
 				{
-					setValue(rng,world,x,y,z);
+					setValue(new RNG(seed,x,y,z),world,x,y,z);
 				}
 			}
 		}
@@ -276,6 +279,10 @@ public class TreeNodeArea {
 			case METABALL:
 				mod.setRNG(rng);
 				((MetaballModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
+				break;
+			case VORONOI:
+				mod.setRNG(rng);
+				((VoronoiModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
 				break;
 			}
 		}

@@ -37,14 +37,20 @@ public class World {
 		return rawData[0][0].length;
 	}
 	
+	public void initValue(int x, int y, int z)
+	{
+		rawData[x][y][z] = new Stack<Integer>();
+		rawData[x][y][z].push(0);
+	}
 	public void setValue(int x, int y, int z, int value)
 	{
 		if (x >= getWidth() || y >= getHeight() || z >= getDepth() || x < 0 || y < 0 || z < 0)
 		{
 			return;
 		}
-		if (rawData[x][y][z].peek() != -3 || value == -4)
-			rawData[x][y][z].push(value);
+		Stack<Integer> stack = rawData[x][y][z];
+		if (stack.peek() != -3 || value == -4)
+			stack.push(value);
 	}
 	
 	public void replaceValue(int x, int y, int z, int value)
@@ -53,37 +59,39 @@ public class World {
 		{
 			return;
 		}
-		rawData[x][y][z].pop();
-		rawData[x][y][z].push(value);
+		Stack<Integer> stack = rawData[x][y][z];
+		stack.pop();
+		stack.push(value);
 	}
 	
 	public int getValue(int x, int y, int z)
 	{
-		while(!rawData[x][y][z].empty() && rawData[x][y][z].peek() < 1)
+		Stack<Integer> stack = rawData[x][y][z];
+		while(!stack.empty() && stack.peek() < 1)
 		{
-			switch(rawData[x][y][z].pop())
+			switch(stack.pop())
 			{
 			case 0:
 				break;
 			case -1:
-				rawData[x][y][z].push(-1);
+				stack.push(-1);
 				return 0;
 			case -2:
-				while(!rawData[x][y][z].empty() && rawData[x][y][z].peek() == 0)
-					rawData[x][y][z].pop();
-				if (!rawData[x][y][z].empty())
-					rawData[x][y][z].pop();
+				while(!stack.empty() && stack.peek() == 0)
+					stack.pop();
+				if (!stack.empty())
+					stack.pop();
 			case -3:
 				break;
 			case -4:
-				if (rawData[x][y][z].peek() == -3)
-					rawData[x][y][z].pop();
+				if (stack.peek() == -3)
+					stack.pop();
 				break;
 			}
 		}
-		if (rawData[x][y][z].empty())
+		if (stack.empty())
 			return 0;
-		return rawData[x][y][z].peek();
+		return stack.peek();
 	}
 	
 }

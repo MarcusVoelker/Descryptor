@@ -1,7 +1,7 @@
 Modifier Stone {
-	ModType = Perlin
+	ModType = Voronoi
 	ChangeType = Modify
-	scale = 128;
+	count = 30;
 	Prob 1 = 1
 	Type 1 = Stone
 	Prob 2 = 1
@@ -92,8 +92,10 @@ Area Sky {
 		rand = 6.28*$i/$n;
 		xPos = 0.45+0.5*sin(rand);
 		yPos = 0.45+0.5*cos(rand);
+		zPos = 0.0:0.9;
 		width = 0.1;
 		height = 0.1;
+		depth = 0.1;
 	}
 }
 

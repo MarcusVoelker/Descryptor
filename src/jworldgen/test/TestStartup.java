@@ -2,6 +2,7 @@ package jworldgen.test;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.generator.Generator;
+import jworldgen.generator.RNG;
 import jworldgen.generator.World;
 
 import org.lwjgl.LWJGLException;
@@ -35,15 +36,48 @@ public class TestStartup {
 	public static void main(String[] args)
 	{
 		try {
-			Display.setDisplayMode(new DisplayMode(1024,1024));
+			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
-			World world = Generator.generateFromFile("data/TestRules.txt", 1024, 1024, 1);
+			long seed;
+			if (args.length == 0)
+			{
+				RNG seedGen = new RNG();
+				seed = seedGen.nextInt(0, Integer.MAX_VALUE);
+			}
+			else
+			{
+				String seedArg = args[0];
+				seed = Long.parseLong(seedArg.substring(6));
+			}
+			Generator gen = Generator.getGeneratorFromFile("data/TestRules.txt", seed);
+			World world = gen.createWorld(200, 200, 40);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			float widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
 			float heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
+			for (int k = 0; k < world.getDepth(); k++)
+			{
+				for (int i =0; i < world.getWidth(); i++)
+				{
+					for (int j = 0; j < world.getHeight(); j++)
+					{
+						gen.calculateBlock(world, i, j, k);
+						int color = world.getValue(i, j, k);
+						setColor(color,0.5f,color/10.0f,10);
+						
+						// draw quad
+						GL11.glBegin(GL11.GL_QUADS);
+						    GL11.glVertex2f(widthFactor*i,heightFactor*j);
+						    GL11.glVertex2f(widthFactor*(i+1),heightFactor*j);
+						    GL11.glVertex2f(widthFactor*(i+1),heightFactor*(j+1));
+						    GL11.glVertex2f(widthFactor*i,heightFactor*(j+1));
+						GL11.glEnd();
+					}
+				}
+				Display.update();
+			}
 			while(!Display.isCloseRequested())
 			{
 				// Clear the screen and depth buffer
@@ -69,6 +103,7 @@ public class TestStartup {
 					Display.update();
 				}
 			}
+				
 			Display.destroy();
 		} catch (LWJGLException e) {
 			// TODO Auto-generated catch block

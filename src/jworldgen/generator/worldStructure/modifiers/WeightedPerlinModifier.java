@@ -22,8 +22,8 @@ public class WeightedPerlinModifier extends PerlinModifier{
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		this.scale = (Integer) resolver.getVariable("scale");
-		this.heightWeight = (Float) resolver.getVariable("heightWeight");
+		this.scale = resolver.getVariable("scale").intValue();
+		this.heightWeight = resolver.getVariable("heightWeight").floatValue();
 	}
 
 	@Override
