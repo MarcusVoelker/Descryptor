@@ -1,7 +1,7 @@
 package jworldgen.exceptionHandler;
 
 public class ExceptionLogger {
-	private final static LoggerLevel level = LoggerLevel.WARNING;
+	private final static LoggerLevel level = LoggerLevel.COARSE;
 	public static void logException(Throwable e, LoggerLevel logLevel) throws CriticalFailure
 	{
 		try {

@@ -1,6 +1,7 @@
 package jworldgen.generator.worldStructure;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
@@ -225,21 +226,21 @@ public class TreeNodeArea {
 		subAreas = realSubAreas;
 	}
 	
-	private void determineValue(RNG rng, World world, int x, int y, int z)
+	private void determineValue(RNG rng, Stack<Integer> stack, int x, int y, int z)
 	{
-		world.setValue(x, y, z, tileID);
+		stack.push(tileID);
 		for (Modifier mod : modifiers)
 		{
 			int value = mod.getValue(x, y, z);
 			switch(mod.getChangeType())
 			{
 			case MODIFY:
-				world.replaceValue(x, y, z, value);
+				stack.pop();
 				break;
 			case STACK:
-				world.setValue(x, y, z, value);
 				break;
 			}
+			stack.push(value);
 		}
 	}
 	public void fillWorld(long seed, World world)
@@ -251,7 +252,40 @@ public class TreeNodeArea {
 			{
 				for (int z = minZ; z < maxZ; z++)
 				{
-					setValue(new RNG(seed,x,y,z),world,x,y,z);
+					Stack<Integer> stack = new Stack<Integer>();
+					setValue(new RNG(seed,x,y,z),stack,x,y,z);
+					boolean breakLoop = false;
+					while(!stack.empty() && stack.peek() < 1 && !breakLoop)
+					{
+						switch(stack.pop())
+						{
+						case 0:
+							break;
+						case -1:
+							stack.push(-1);
+							breakLoop = true;
+							break;
+						case -2:
+							while(!stack.empty() && stack.peek() == 0)
+								stack.pop();
+							if (!stack.empty())
+								stack.pop();
+						case -3:
+							break;
+						case -4:
+							if (stack.peek() == -3)
+								stack.pop();
+							break;
+						}
+					}
+					if (stack.empty() || stack.peek() < 1)
+					{
+						world.setValue(x, y, z, 0);
+					}
+					else
+					{
+						world.setValue(x, y, z, stack.peek());
+					}
 				}
 			}
 		}
@@ -297,13 +331,13 @@ public class TreeNodeArea {
 		}
 	}
 	
-	public void setValue(RNG rng, World world, int x, int y, int z)
+	public void setValue(RNG rng, Stack<Integer> stack, int x, int y, int z)
 	{
 		if (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ)
-			determineValue(rng,world,x,y,z);
+			determineValue(rng,stack,x,y,z);
 		for (TreeNodeArea tna: subAreas)
 		{
-			tna.setValue(rng, world, x, y, z);
+			tna.setValue(rng, stack, x, y, z);
 		}
 	}
 	

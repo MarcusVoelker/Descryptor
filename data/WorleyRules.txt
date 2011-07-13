@@ -1,7 +1,7 @@
 Modifier Voronoi {
 	ModType = Worley
 	ChangeType = Modify
-	count = 10;
+	count = 20;
 	radius = 10;
 	Prob 1 = 1
 	Type 1 = Type1
@@ -21,7 +21,7 @@ Modifier Voronoi {
 	Type 8 = Type8
 	Prob 9 = 1
 	Type 9 = Type9
-	Prob 10 = 1
+	Prob 10 = 10
 	Type 10 = None
 }
 
