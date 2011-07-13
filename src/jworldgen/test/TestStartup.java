@@ -49,8 +49,8 @@ public class TestStartup {
 				String seedArg = args[0];
 				seed = Long.parseLong(seedArg.substring(6));
 			}
-			Generator gen = Generator.getGeneratorFromFile("data/TestRules.txt", seed);
-			World world = gen.createWorld(200, 200, 40);
+			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
+			World world = gen.createWorld(200, 200, 1);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);

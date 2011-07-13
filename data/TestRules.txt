@@ -1,5 +1,5 @@
 Modifier Stone {
-	ModType = Voronoi
+	ModType = Worley
 	ChangeType = Modify
 	count = 30;
 	Prob 1 = 1

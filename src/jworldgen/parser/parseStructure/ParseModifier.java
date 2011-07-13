@@ -13,8 +13,9 @@ import jworldgen.generator.worldStructure.modifiers.ChangeType;
 import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
-import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.VoronoiModifier;
+import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
+import jworldgen.generator.worldStructure.modifiers.WorleyModifier;
 
 public class ParseModifier {
 	private Hashtable<Integer,Integer> probabilities;
@@ -99,6 +100,8 @@ public class ParseModifier {
 			return new MetaballModifier(typeIDs.get(0),identifier,assignments,chType);
 		if (type.equals("Voronoi"))
 			return new VoronoiModifier(probabilities,typeIDs,identifier,assignments,chType);
+		if (type.equals("Worley"))
+			return new WorleyModifier(probabilities,typeIDs,identifier,assignments,chType);
 		try {
 			ExceptionLogger.logException(new IllegalModifierType(type), LoggerLevel.ERROR);
 		} catch (CriticalFailure e) {

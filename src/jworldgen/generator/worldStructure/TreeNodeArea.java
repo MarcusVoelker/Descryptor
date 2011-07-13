@@ -12,8 +12,9 @@ import jworldgen.generator.World;
 import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
 import jworldgen.generator.worldStructure.modifiers.Modifier;
 import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
-import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.VoronoiModifier;
+import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
+import jworldgen.generator.worldStructure.modifiers.WorleyModifier;
 import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 
@@ -283,6 +284,10 @@ public class TreeNodeArea {
 			case VORONOI:
 				mod.setRNG(rng);
 				((VoronoiModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
+				break;
+			case WORLEY:
+				mod.setRNG(rng);
+				((WorleyModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
 				break;
 			}
 		}
