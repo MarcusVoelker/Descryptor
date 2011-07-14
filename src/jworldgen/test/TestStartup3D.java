@@ -68,7 +68,6 @@ public class TestStartup3D {
 			GLU.gluPerspective(45.0f, 1.0f, 0.5f, 400.0f);
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			glEnable(GL_DEPTH_TEST);
-			glEnable(GL11.GL_CULL_FACE);
 			GL11.glCullFace(GL11.GL_FRONT); // Doesn't draw back faces
 			float angle = 0.01f;
 			while(!Display.isCloseRequested())
@@ -93,6 +92,7 @@ public class TestStartup3D {
 								setColor(color,0.5f,color/10.0f,10);
 								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 								// draw quad
+								glEnable(GL11.GL_CULL_FACE);
 								glEnable( GL11.GL_POLYGON_OFFSET_FILL );
 								GL11.glPolygonOffset( 1, 1 );
 								GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
@@ -113,19 +113,28 @@ public class TestStartup3D {
 								GL11.glEnd();
 								GL11.glDisable( GL11.GL_POLYGON_OFFSET_FILL );
 								GL11.glColor3f(0.05f,0.05f,0.05f);
+								GL11.glDisable(GL11.GL_CULL_FACE);
 								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 								// draw quad
-								GL11.glBegin(GL11.GL_QUAD_STRIP);
+								GL11.glBegin(GL11.GL_LINE_STRIP);
 								    GL11.glVertex3f(0,0,0);
 								    GL11.glVertex3f(0,1,0);
-								    GL11.glVertex3f(1,0,0);
 								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(1,0,0);
+								    GL11.glVertex3f(0,0,0);
 								    GL11.glVertex3f(0,0,1);
 								    GL11.glVertex3f(0,1,1);
-								    GL11.glVertex3f(1,0,1);
 								    GL11.glVertex3f(1,1,1);
-								    GL11.glVertex3f(0,0,0);
+								    GL11.glVertex3f(1,0,1);
+								    GL11.glVertex3f(0,0,1);
+								GL11.glEnd();
+								GL11.glBegin(GL11.GL_LINES);
+									GL11.glVertex3f(1,0,0);
+								    GL11.glVertex3f(1,0,1);
 								    GL11.glVertex3f(0,1,0);
+								    GL11.glVertex3f(0,1,1);
+								    GL11.glVertex3f(1,1,0);
+								    GL11.glVertex3f(1,1,1);
 								GL11.glEnd();
 								GL11.glTranslatef(0.0f, j, 0.0f);
 							}
