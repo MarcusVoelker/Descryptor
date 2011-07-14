@@ -3,8 +3,6 @@ package jworldgen.test;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 import jworldgen.exceptionHandler.CriticalFailure;
-import jworldgen.exceptionHandler.ExceptionLogger;
-import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.generator.Generator;
 import jworldgen.generator.World;
 
@@ -20,6 +18,7 @@ public class TestStartup3D {
 	private static final float ROT_SPEED = 3;
 	private static int cuttingDepth = 0;
 	private static boolean pressed = false;
+	private static String levelName = "data/TestRules.txt";
 	private static void setColor(int hue, float sat, float val, int max)
 	{
 		int h = 6*hue/max;
@@ -100,10 +99,10 @@ public class TestStartup3D {
 			}
 		}
 	}
-	private static void load(String filename)
+	private static void load()
 	{
 		try {
-			world = Generator.generateFromFile(filename, 50, 50, 50);
+			world = Generator.generateFromFile(levelName, 50, 50, 50);
 			drawThis = new byte[world.getWidth()][world.getHeight()][world.getDepth()];
 			setDrawingStates();
 		} catch (CriticalFailure e) {
@@ -116,7 +115,7 @@ public class TestStartup3D {
 		try {
 			Display.setDisplayMode(new DisplayMode(800,800));
 			Display.create();
-			load("data/WorleyRules.txt");
+			load();
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GLU.gluPerspective(45.0f, 1.0f, 0.5f, 400.0f);
@@ -228,7 +227,7 @@ public class TestStartup3D {
 					angle1 = 0;
 					angle2 = 0;
 					angle3 = 0;
-					load("data/WorleyRules.txt");
+					load();
 				}
 				if (leftPressed && !pressed) {
 					cuttingDepth++;

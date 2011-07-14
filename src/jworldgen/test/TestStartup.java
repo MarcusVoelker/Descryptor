@@ -39,10 +39,11 @@ public class TestStartup {
 	private static float heightFactor;
 	private static Generator gen;
 	private static World world;
-	private static void load(long seed, String filename)
+	private static String levelName = "data/TestRules.txt";
+	private static void load(long seed)
 	{
 		try {
-			gen = Generator.getGeneratorFromFile(filename, seed);
+			gen = Generator.getGeneratorFromFile(levelName, seed);
 			world = gen.createWorld(400, 400, 1);
 			widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
 			heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
@@ -68,7 +69,6 @@ public class TestStartup {
 				Display.update();
 			}
 		} catch (CriticalFailure e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -88,7 +88,7 @@ public class TestStartup {
 				String seedArg = args[0];
 				seed = Long.parseLong(seedArg.substring(6));
 			}
-			load(seed,"data/TestRules.txt");
+			load(seed);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
@@ -131,13 +131,12 @@ public class TestStartup {
 						String seedArg = args[0];
 						seed = Long.parseLong(seedArg.substring(6));
 					}
-					load(seed, "data/TestRules.txt");
+					load(seed);
 				}
 			}
 				
 			Display.destroy();
 		} catch (LWJGLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}

@@ -49,7 +49,7 @@ ModifierGroup Gold {
 Modifier SurMod {
 	ModType = WeightedPerlin
 	scale = 16;
-	heightWeight = 4.0;
+	heightWeight = 1.0;
 }
 
 ModifierGroup SurMod {
@@ -60,7 +60,7 @@ ModifierGroup SurMod {
 	Type 1 = Erase
 	Prob 2 = 1
 	Type 2 = Sand
-	Prob 3 = 12
+	Prob 3 = 3
 	Type 3 = None
 }
 

@@ -1,11 +1,8 @@
 package jworldgen.generator;
 
-import java.util.Stack;
-
 public class World {
 	private int [][][] rawData;
 	
-	@SuppressWarnings("unchecked")
 	public World(int width, int height, int depth)
 	{
 		rawData = new int[width][height][depth];

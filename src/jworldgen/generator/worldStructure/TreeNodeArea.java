@@ -10,12 +10,6 @@ import jworldgen.exceptionHandler.RecursionException;
 import jworldgen.generator.RNG;
 import jworldgen.generator.VariableResolver;
 import jworldgen.generator.World;
-import jworldgen.generator.worldStructure.modifiers.MetaballModifier;
-import jworldgen.generator.worldStructure.modifiers.Modifier;
-import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
-import jworldgen.generator.worldStructure.modifiers.VoronoiModifier;
-import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
-import jworldgen.generator.worldStructure.modifiers.WorleyModifier;
 import jworldgen.parser.parseStructure.ParseAssignment;
 import jworldgen.parser.parseStructure.ParseSubArea;
 

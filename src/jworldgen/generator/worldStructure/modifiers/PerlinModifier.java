@@ -1,8 +1,6 @@
 package jworldgen.generator.worldStructure.modifiers;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 import jworldgen.generator.PerlinGenerator;
 import jworldgen.generator.RNG;
