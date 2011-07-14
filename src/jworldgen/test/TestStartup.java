@@ -6,6 +6,7 @@ import jworldgen.generator.RNG;
 import jworldgen.generator.World;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -33,30 +34,18 @@ public class TestStartup {
 			GL11.glColor3f(val,p,q);
 	}
 	
-	public static void main(String[] args)
+
+	private static float widthFactor;
+	private static float heightFactor;
+	private static Generator gen;
+	private static World world;
+	private static void load(long seed, String filename)
 	{
 		try {
-			Display.setDisplayMode(new DisplayMode(800,800));
-			Display.create();
-			long seed;
-			if (args.length == 0)
-			{
-				RNG seedGen = new RNG();
-				seed = seedGen.nextInt(0, Integer.MAX_VALUE);
-			}
-			else
-			{
-				String seedArg = args[0];
-				seed = Long.parseLong(seedArg.substring(6));
-			}
-			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
-			World world = gen.createWorld(400, 400, 1);
-			GL11.glMatrixMode(GL11.GL_PROJECTION);
-			GL11.glLoadIdentity();
-			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
-			GL11.glMatrixMode(GL11.GL_MODELVIEW);
-			float widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
-			float heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
+			gen = Generator.getGeneratorFromFile(filename, seed);
+			world = gen.createWorld(400, 400, 1);
+			widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
+			heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
 			for (int k = 0; k < world.getDepth(); k++)
 			{
 				for (int i =0; i < world.getWidth(); i++)
@@ -78,6 +67,34 @@ public class TestStartup {
 				}
 				Display.update();
 			}
+		} catch (CriticalFailure e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void main(String[] args)
+	{
+		try {
+			Display.setDisplayMode(new DisplayMode(800,800));
+			Display.create();
+			long seed;
+			if (args.length == 0)
+			{
+				RNG seedGen = new RNG();
+				seed = seedGen.nextInt(0, Integer.MAX_VALUE);
+			}
+			else
+			{
+				String seedArg = args[0];
+				seed = Long.parseLong(seedArg.substring(6));
+			}
+			load(seed,"data/TestRules.txt");
+			GL11.glMatrixMode(GL11.GL_PROJECTION);
+			GL11.glLoadIdentity();
+			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);
+			GL11.glMatrixMode(GL11.GL_MODELVIEW);
+			float widthFactor = Display.getDisplayMode().getWidth()/world.getWidth();
+			float heightFactor = Display.getDisplayMode().getHeight()/world.getHeight();
 			while(!Display.isCloseRequested())
 			{
 				// Clear the screen and depth buffer
@@ -102,16 +119,26 @@ public class TestStartup {
 					}
 					Display.update();
 				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_R))
+				{
+					if (args.length == 0)
+					{
+						RNG seedGen = new RNG();
+						seed = seedGen.nextInt(0, Integer.MAX_VALUE);
+					}
+					else
+					{
+						String seedArg = args[0];
+						seed = Long.parseLong(seedArg.substring(6));
+					}
+					load(seed, "data/TestRules.txt");
+				}
 			}
 				
 			Display.destroy();
 		} catch (LWJGLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (CriticalFailure e) {
-			// TODO Auto-generated catch block
-			System.err.println(e.getMessage());
-			e.printStackTrace();
-		}
+		} 
 	}
 }
