@@ -1,45 +1,66 @@
 Modifier Stone {
-	ModType = Worley
+	ModType = Perlin
+	scale = 128;
+}
+
+ModifierGroup Stone {
 	ChangeType = Modify
-	count = 30;
+	Modifier Stone
+	Modifier Iron
+	result = sin(Stone*Iron);
 	Prob 1 = 1
 	Type 1 = Stone
-	Prob 2 = 1
+	Prob 2 = 3
 	Type 2 = None
-	Prob 3 = 1
+	Prob 3 = 4
 	Type 3 = CrackedStone
 }
 
 Modifier Iron {
 	ModType = Perlin
-	ChangeType = Modify
 	scale = 32;
+}
+
+ModifierGroup Iron {
+	ChangeType = Modify
+	Modifier Iron
+	result = Iron;
 	Prob 1 = 2
-	Type 1 = None	
+	Type 1 = None
 	Prob 2 = 1
 	Type 2 = Iron
 }
 
 Modifier Gold {
 	ModType = Perlin
-	ChangeType = Modify
 	scale = 16;
+}
+
+ModifierGroup Gold {
+	ChangeType = Modify
+	Modifier Gold
+	result = Gold;
 	Prob 1 = 5
-	Type 1 = None	
+	Type 1 = None
 	Prob 2 = 2
 	Type 2 = Gold
 }
 
 Modifier SurMod {
 	ModType = WeightedPerlin
-	ChangeType = Stack
 	scale = 16;
 	heightWeight = 4.0;
-	Prob 1 = 1
+}
+
+ModifierGroup SurMod {
+	ChangeType = Stack
+	Modifier SurMod
+	result = SurMod;
+	Prob 1 = 3
 	Type 1 = Erase
 	Prob 2 = 1
 	Type 2 = Sand
-	Prob 3 = 10
+	Prob 3 = 12
 	Type 3 = None
 }
 
@@ -70,7 +91,7 @@ Area Blob {
 }
 Area Surface {
 	Type = None
-	Modifier SurMod
+	ModifierGroup SurMod
 }
 Area Sky {
 	Type = None
@@ -117,8 +138,8 @@ Area Tower {
 
 Area Ground {
 	Type = Earth
-	Modifier Stone
-	Modifier Iron
+	ModifierGroup Stone
+	ModifierGroup Iron
 	SubArea {
 		AreaType = GoldenGround
 		count = 1;
@@ -138,5 +159,5 @@ Area Ground {
 }
 Area GoldenGround {
 	Type = None
-	Modifier Gold
+	ModifierGroup Gold
 }

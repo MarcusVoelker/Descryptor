@@ -9,24 +9,19 @@ import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class WorleyModifier extends Modifier {
 	
-	protected Hashtable<Integer,Integer> probabilities;
-	protected Hashtable<Integer,Integer> typeIDs;
 	protected VariableResolver resolver;
 	protected ArrayList<Integer> xPos;
 	protected ArrayList<Integer> yPos;
 	protected ArrayList<Integer> zPos;
 	
 	protected int probSum;
-	protected int radius;
 	
-	public WorleyModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
+	public WorleyModifier(String identifier, ArrayList<ParseAssignment> assignments)
 	{
-		super(identifier, assignments, chType);
+		super(identifier, assignments);
 		this.type = ModifierType.WORLEY;
 		this.identifier = identifier;
 		this.assignments = assignments;
-		this.probabilities = probabilities;
-		this.typeIDs = typeIDs;
 		resolver = new VariableResolver();
 		if (assignments != null)
 		{
@@ -35,16 +30,10 @@ public class WorleyModifier extends Modifier {
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		radius = resolver.getVariable("radius").intValue();
-		probSum = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			probSum += probabilities.get(e.nextElement());
-		}
 	}
 	@Override
 	public Modifier clone() {
-		return new WorleyModifier(probabilities, typeIDs, identifier, assignments, chType);
+		return new WorleyModifier(identifier, assignments);
 	}
 
 	@Override
@@ -62,7 +51,7 @@ public class WorleyModifier extends Modifier {
 		}
 	}
 	@Override
-	public int getValue(int x, int y, int z) {
+	public float getValue(int x, int y, int z) {
 		float nextDist = Float.MAX_VALUE;
 		for (int i = 0; i < xPos.size(); i++)
 		{
@@ -73,16 +62,6 @@ public class WorleyModifier extends Modifier {
 				nextDist = dist;
 			}
 		}
-		int curProb = probSum;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			int key = e.nextElement();
-			curProb -= probabilities.get(key);
-			if (curProb/(float)probSum <= nextDist/(radius*radius))
-			{
-				return typeIDs.get(key);
-			}
-		}
-		return 0;
+		return nextDist;
 	}
 }

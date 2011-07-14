@@ -22,10 +22,10 @@ import jworldgen.parser.parseStructure.ParseSubArea;
 public class TreeNodeArea {
 	private ArrayList<ParseSubArea> parseSubAreas;
 	private Integer tileID;
-	private ArrayList<String> parseModifiers;
+	private ArrayList<String> parseModifierGroups;
 	
 	private ArrayList<TreeNodeArea> subAreas;
-	private ArrayList<Modifier> modifiers;
+	private ArrayList<ModifierGroup> modifierGroups;
 	
 	protected float xPos;
 	protected float yPos;
@@ -50,23 +50,23 @@ public class TreeNodeArea {
 	public TreeNodeArea()
 	{
 		subAreas = new ArrayList<TreeNodeArea>();
-		modifiers = new ArrayList<Modifier>();
+		modifierGroups = new ArrayList<ModifierGroup>();
 	}
 	
-	public TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, String identifier, ArrayList<String> parseModifiers)
+	public TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, String identifier, ArrayList<String> parseModifierGroups)
 	{
 		this();
 		this.parseSubAreas = parseSubAreas;
 		this.tileID = tileID;
 		this.identifier = identifier;
-		this.parseModifiers = parseModifiers;
+		this.parseModifierGroups = parseModifierGroups;
 	}
 	
-	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, ArrayList<TreeNodeArea> subAreas,String identifier, ArrayList<Modifier> modifiers)
+	private TreeNodeArea(ArrayList<ParseSubArea> parseSubAreas, Integer tileID, ArrayList<TreeNodeArea> subAreas,String identifier, ArrayList<ModifierGroup> modifierGroups)
 	{
 		this(parseSubAreas,tileID,identifier,null);
 		this.subAreas = subAreas;
-		this.modifiers = modifiers;
+		this.modifierGroups = modifierGroups;
 	}
 	
 	public void makeStamp()
@@ -84,10 +84,10 @@ public class TreeNodeArea {
 		return result;
 	}
 	
-	public ArrayList<String> getModifierNames()
+	public ArrayList<String> getModifierGroupNames()
 	{
 		ArrayList<String> result = new ArrayList<String>();
-		for (String mod: parseModifiers)
+		for (String mod: parseModifierGroups)
 		{
 			result.add(mod);
 		}
@@ -102,6 +102,7 @@ public class TreeNodeArea {
 		else
 			this.assignments = (ArrayList<ParseAssignment>) assignments.clone();
 	}
+	
 	public void addSubArea(TreeNodeArea area) throws CriticalFailure
 	{
 		subAreas.add(area);
@@ -127,14 +128,14 @@ public class TreeNodeArea {
 		return identifier;
 	}
 	
-	public void addModifier(Modifier mod) throws CriticalFailure
+	public void addModifierGroup(ModifierGroup mod) throws CriticalFailure
 	{
-		modifiers.add(mod);
+		modifierGroups.add(mod);
 	}
 	
 	public TreeNodeArea clone()
 	{
-		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, modifiers);
+		TreeNodeArea newArea = new TreeNodeArea(parseSubAreas, tileID, subAreas, identifier, modifierGroups);
 		newArea.setAssignments(assignments);
 		if (isStamp)
 			newArea.makeStamp();
@@ -229,18 +230,22 @@ public class TreeNodeArea {
 	private void determineValue(RNG rng, Stack<Integer> stack, int x, int y, int z)
 	{
 		stack.push(tileID);
-		for (Modifier mod : modifiers)
+		for (ModifierGroup mod : modifierGroups)
 		{
 			int value = mod.getValue(x, y, z);
 			switch(mod.getChangeType())
 			{
 			case MODIFY:
-				stack.pop();
+				if (value != 0)
+				{
+					stack.pop();
+					stack.push(value);
+				}
 				break;
 			case STACK:
+				stack.push(value);
 				break;
 			}
-			stack.push(value);
 		}
 	}
 	public void fillWorld(long seed, World world)
@@ -299,31 +304,10 @@ public class TreeNodeArea {
 		maxX = (int) Math.floor((xPos+width)*world.getWidth());
 		maxY = (int) Math.floor((yPos+height)*world.getHeight());
 		maxZ = (int) Math.floor((zPos+depth)*world.getDepth());
-		for (Modifier mod : modifiers)
+		for (ModifierGroup mod : modifierGroups)
 		{
-			switch(mod.getType())
-			{
-			case PERLIN:
-				((PerlinModifier) mod).setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
-				mod.setLocation(minX, minY, minZ, maxX, maxY, maxZ);
-				break;
-			case WEIGHTED_PERLIN:
-				((WeightedPerlinModifier) mod).setRNG(rng, Math.max(world.getWidth(),world.getHeight()));
-				mod.setLocation(minX, minY, minZ, maxX, maxY, maxZ);
-				break;
-			case METABALL:
-				mod.setRNG(rng);
-				((MetaballModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
-				break;
-			case VORONOI:
-				mod.setRNG(rng);
-				((VoronoiModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
-				break;
-			case WORLEY:
-				mod.setRNG(rng);
-				((WorleyModifier) mod).setLocation(minX, minY, minZ, maxX, maxY, maxZ);
-				break;
-			}
+			mod.setLocation(minX,minY,minZ,maxX,maxY,maxZ);
+			mod.prepareForFilling(rng, world);
 		}
 		for (TreeNodeArea tna: subAreas)
 		{

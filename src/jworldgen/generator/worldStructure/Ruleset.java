@@ -31,17 +31,19 @@ public class Ruleset
 		list.insertBlockIDs(blockMap);
 		Hashtable<String,TreeNodeArea> areas = list.createAreaNodes();
 		Hashtable<String,Modifier> modifiers = list.createModifiers();	
+		Hashtable<String,ModifierGroup> modifierGroups = list.createModifierGroups();	
 		for (Enumeration<String> e = areas.keys(); e.hasMoreElements();)
 		{
 			String areaName = e.nextElement();
-			ArrayList<String> modNames = areas.get(areaName).getModifierNames();
+			ArrayList<String> modNames = areas.get(areaName).getModifierGroupNames();
 			for (String name : modNames)
 			{
-				Modifier mod = modifiers.get(name);
+				ModifierGroup mod = modifierGroups.get(name);
 				if (mod != null)
 				{
-					ExceptionLogger.log("Adding Modifier \""+name+"\"", LoggerLevel.FINEST);
-					areas.get(areaName).addModifier(mod.clone());
+					ExceptionLogger.log("Adding ModifierGroup \""+name+"\"", LoggerLevel.FINEST);
+					mod.addModifiers(modifiers);
+					areas.get(areaName).addModifierGroup(mod.clone());
 				}
 				else
 				{

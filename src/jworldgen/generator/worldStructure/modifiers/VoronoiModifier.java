@@ -9,22 +9,17 @@ import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class VoronoiModifier extends Modifier {
 	
-	protected Hashtable<Integer,Integer> probabilities;
-	protected Hashtable<Integer,Integer> typeIDs;
 	protected VariableResolver resolver;
 	protected ArrayList<Integer> xPos;
 	protected ArrayList<Integer> yPos;
 	protected ArrayList<Integer> zPos;
-	protected ArrayList<Integer> types;
 	
-	public VoronoiModifier(Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
+	public VoronoiModifier(String identifier, ArrayList<ParseAssignment> assignments)
 	{
-		super(identifier, assignments, chType);
+		super(identifier, assignments);
 		this.type = ModifierType.VORONOI;
 		this.identifier = identifier;
 		this.assignments = assignments;
-		this.probabilities = probabilities;
-		this.typeIDs = typeIDs;
 		resolver = new VariableResolver();
 		if (assignments != null)
 		{
@@ -36,7 +31,7 @@ public class VoronoiModifier extends Modifier {
 	}
 	@Override
 	public Modifier clone() {
-		return new VoronoiModifier(probabilities, typeIDs, identifier, assignments, chType);
+		return new VoronoiModifier(identifier, assignments);
 	}
 
 	@Override
@@ -46,33 +41,15 @@ public class VoronoiModifier extends Modifier {
 		xPos = new ArrayList<Integer>();
 		yPos = new ArrayList<Integer>();
 		zPos = new ArrayList<Integer>();
-		types = new ArrayList<Integer>();
-		int probSum = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			probSum += probabilities.get(e.nextElement());
-		}
 		for (int i = 0; i < (Integer) resolver.getVariable("count"); i++)
 		{
 			xPos.add(rng.nextInt(minX, maxX));
 			yPos.add(rng.nextInt(minY, maxY));
 			zPos.add(rng.nextInt(minZ, maxZ));
-			int rnd = rng.nextInt(0, probSum);
-			int curProb = probSum;
-			for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-			{
-				int key = e.nextElement();
-				curProb -= probabilities.get(key);
-				if (curProb <= rnd)
-				{
-					types.add(typeIDs.get(key));
-					break;
-				}
-			}
 		}
 	}
 	@Override
-	public int getValue(int x, int y, int z) {
+	public float getValue(int x, int y, int z) {
 		int value = 0;
 		float nextDist = Float.MAX_VALUE;
 		for (int i = 0; i < xPos.size(); i++)
@@ -82,7 +59,7 @@ public class VoronoiModifier extends Modifier {
 			if (dist < nextDist)
 			{
 				nextDist = dist;
-				value = types.get(i);
+				value = i;
 			}
 		}
 		return value;

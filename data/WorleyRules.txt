@@ -1,31 +1,48 @@
-Modifier Voronoi {
+Modifier Worley {
 	ModType = Worley
+	count = 10;
+}
+
+Modifier Perlin {
+	ModType = Perlin
+	scale = 16;
+}
+
+Modifier Metaball {
+	ModType = Metaball
+	count = 10;
+	threshold = 0.3;
+}
+
+ModifierGroup Worley {
 	ChangeType = Modify
-	count = 20;
-	radius = 10;
+	Modifier Worley
+	Modifier Perlin
+	Modifier Metaball
+	result = Metaball*Perlin*sqrt(Worley)/10;
 	Prob 1 = 1
-	Type 1 = Type1
-	Prob 2 = 1
+	Type 1 = None
+	Prob 2 = 10
 	Type 2 = Type2
-	Prob 3 = 1
+	Prob 3 = 10
 	Type 3 = Type3
-	Prob 4 = 1
+	Prob 4 = 10
 	Type 4 = Type4
-	Prob 5 = 1
+	Prob 5 = 10
 	Type 5 = Type5
-	Prob 6 = 1
+	Prob 6 = 10
 	Type 6 = Type6
-	Prob 7 = 1
+	Prob 7 = 10
 	Type 7 = Type7
-	Prob 8 = 1
+	Prob 8 = 10
 	Type 8 = Type8
-	Prob 9 = 1
+	Prob 9 = 10
 	Type 9 = Type9
-	Prob 10 = 10
+	Prob 10 = 100
 	Type 10 = None
 }
 
 Area World {
 	Type = None
-	Modifier Voronoi
+	ModifierGroup Worley
 }

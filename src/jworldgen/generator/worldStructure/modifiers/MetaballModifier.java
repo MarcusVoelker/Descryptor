@@ -7,20 +7,18 @@ import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class MetaballModifier extends Modifier {
 	
-	protected int typeID;
 	protected float threshold;
 	protected VariableResolver resolver;
 	protected ArrayList<Integer> xPos;
 	protected ArrayList<Integer> yPos;
 	protected ArrayList<Integer> zPos;
 	
-	public MetaballModifier(int typeID, String identifier, ArrayList<ParseAssignment> assignments, ChangeType chType)
+	public MetaballModifier(String identifier, ArrayList<ParseAssignment> assignments)
 	{
-		super(identifier, assignments, chType);
+		super(identifier, assignments);
 		this.type = ModifierType.METABALL;
 		this.identifier = identifier;
 		this.assignments = assignments;
-		this.typeID = typeID;
 		resolver = new VariableResolver();
 		if (assignments != null)
 		{
@@ -33,7 +31,7 @@ public class MetaballModifier extends Modifier {
 	}
 	@Override
 	public Modifier clone() {
-		return new MetaballModifier(typeID, identifier, assignments, chType);
+		return new MetaballModifier(identifier, assignments);
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public class MetaballModifier extends Modifier {
 		}
 	}
 	@Override
-	public int getValue(int x, int y, int z) {
+	public float getValue(int x, int y, int z) {
 		float value = 0;
 		for (int i = 0; i < xPos.size(); i++)
 		{
@@ -63,7 +61,7 @@ public class MetaballModifier extends Modifier {
 		}
 		
 		if (value > threshold)
-			return typeID;
+			return 1;
 		return 0;
 	}
 

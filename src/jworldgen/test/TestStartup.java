@@ -50,7 +50,7 @@ public class TestStartup {
 				seed = Long.parseLong(seedArg.substring(6));
 			}
 			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
-			World world = gen.createWorld(200, 200, 1);
+			World world = gen.createWorld(400, 400, 1);
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
 			GL11.glLoadIdentity();
 			GL11.glOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 1, -1);

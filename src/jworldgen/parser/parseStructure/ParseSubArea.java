@@ -13,8 +13,4 @@ public class ParseSubArea {
 	{
 		this.assignments = new ArrayList<ParseAssignment>();
 	}
-	
-	
-	
-	
 }

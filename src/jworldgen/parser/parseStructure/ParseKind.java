@@ -1,5 +1,5 @@
 package jworldgen.parser.parseStructure;
 
 public enum ParseKind {
-	AREA, MODIFIER, ROOM;
+	AREA, MODIFIER, MODIFIER_GROUP;
 }

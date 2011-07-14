@@ -72,6 +72,7 @@ TOKEN : /* Partitions */
 | < SUBAREA : "SubArea" >
 | < STAMP : "Stamp" >
 | < MODIFIER : "Modifier" >
+| < MODIFIERGROUP : "ModifierGroup" >
 }
 
 TOKEN : /* Room Keys */
@@ -110,6 +111,10 @@ TOKEN: /* ALE Functions */
   < SIN: "sin" >
 | < COS: "cos" >
 | < TAN: "tan" >
+| < ASIN: "asin" >
+| < ACOS: "acos" >
+| < ATAN: "atan" >
+| < SQRT: "sqrt" >
 }
 TOKEN : /* Misc Identifiers */
 {
@@ -131,7 +136,7 @@ ParseList parseRoot():
 }
 
 void partition(ParseList list) :
-{ParseArea area; ParseModifier modifier;}
+{ParseArea area; ParseModifier modifier; ParseModifierGroup mGroup;}
 {
   area = area() partition(list)
   {
@@ -140,6 +145,10 @@ void partition(ParseList list) :
 | modifier = modifier() partition(list)
   {
     list.addModifier(modifier);
+  }
+| mGroup = modifierGroup() partition(list)
+  {
+    list.addModifierGroup(mGroup);
   }
 | < EOF >
 }
@@ -151,9 +160,9 @@ void areaLine(ParseArea area) :
   {
     area.setType(probType.image);
   }
-| < MODIFIER > modType = < IDENT >
+| < MODIFIERGROUP > modType = < IDENT >
   {
-	area.addModifier(modType.image);
+	area.addModifierGroup(modType.image);
   }  
 }
 
@@ -161,33 +170,47 @@ void modifierLine(ParseModifier modifier) :
 {Token probType; Token id; ParseAssignment assignment;}
 {
   
-  < TYPE > 
-  (
-    id = < INTEGER > "=" probType = < IDENT >
-    {
-      modifier.addType(probType.image, Integer.parseInt(id.image));
-    }
-  |
-  	"=" probType = < IDENT >
-  	{
-      modifier.addType(probType.image, 0);
-    }
-  )  
-| < PROB > id = < INTEGER > "=" probType = < INTEGER >
-  {
-    modifier.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
-  }
-| < MODTYPE > "=" probType = < IDENT >
+  < MODTYPE > "=" probType = < IDENT >
   {
     modifier.setType(probType.image);
-  }
-| < CHANGETYPE > "=" probType = < IDENT >
-  {
-    modifier.setChangeType(probType.image);
   }
 | assignment = assignment()
   {
     modifier.assignments.add(assignment);
+  }
+}
+
+void modifierGroupLine(ParseModifierGroup modifierGroup) :
+{Token probType; Token id; ParseAssignment assignment;}
+{
+  
+  < TYPE > 
+  (
+    id = < INTEGER > "=" probType = < IDENT >
+    {
+      modifierGroup.addType(probType.image, Integer.parseInt(id.image));
+    }
+  |
+  	"=" probType = < IDENT >
+  	{
+      modifierGroup.addType(probType.image, 0);
+    }
+  )  
+| < PROB > id = < INTEGER > "=" probType = < INTEGER >
+  {
+    modifierGroup.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
+  }
+| < CHANGETYPE > "=" probType = < IDENT >
+  {
+    modifierGroup.setChangeType(probType.image);
+  }
+| < MODIFIER > probType = < IDENT >
+  {
+    modifierGroup.addModifier(probType.image);
+  }
+| assignment = assignment()
+  {
+    modifierGroup.assignments.add(assignment);
   }
 }
 
@@ -254,6 +277,7 @@ ParseArea area():
   }
 }
 
+
 ParseModifier modifier():
 {ParseModifier modifier = new ParseModifier(); Token ident;}
 {
@@ -261,6 +285,16 @@ ParseModifier modifier():
   {
     modifier.setIdentifier(ident.image);
 	return modifier;
+  }
+}
+
+ParseModifierGroup modifierGroup():
+{ParseModifierGroup modifierGroup = new ParseModifierGroup(); Token ident;}
+{
+  < MODIFIERGROUP > ident = < IDENT > "{" (modifierGroupLine(modifierGroup))* "}"
+  {
+    modifierGroup.setIdentifier(ident.image);
+    return modifierGroup;
   }
 }
 
@@ -342,7 +376,7 @@ void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 	  t = < MINUS > { type = ALEElementType.MINUS; }
 	)
 	{
-		while (!opStack.empty())
+		while (!opStack.empty() && !opStack.peek().equals("("))
 		{
 		  output.add((ALEQueueElement) opStack.pop());
 		}
@@ -355,7 +389,7 @@ void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
 	)
 	{
-		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
+		while (!opStack.empty() && !opStack.peek().equals("(") &&((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
 		{
 			output.add((ALEQueueElement) opStack.pop());
 		}
@@ -380,6 +414,14 @@ void aleFunction(Stack opStack):
 	  t = < COS > { type = ALEElementType.COSINE; }
 	|
 	  t = < TAN > { type = ALEElementType.TANGENT; }
+	|
+	  t = < ASIN > { type = ALEElementType.ARCSINE; }
+	|
+	  t = < ACOS > { type = ALEElementType.ARCCOSINE; }
+	|
+	  t = < ATAN > { type = ALEElementType.ARCTANGENT; }
+	|
+	  t = < SQRT > { type = ALEElementType.SQRT; }
 	)
 	{
 		opStack.push(new ALEQueueElement(t.image,type));

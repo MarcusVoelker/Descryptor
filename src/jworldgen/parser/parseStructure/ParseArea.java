@@ -8,14 +8,14 @@ public class ParseArea {
 	private ArrayList<ParseSubArea> subAreas;
 	private String tileType;
 	private String identifier;
-	private ArrayList<String> modifiers;
+	private ArrayList<String> modifierGroups;
 	
 	private Integer tileID;
 	
 	public ParseArea()
 	{
 		this.subAreas = new ArrayList<ParseSubArea>();
-		this.modifiers = new ArrayList<String>();
+		this.modifierGroups = new ArrayList<String>();
 	}
 	
 	public void addSubArea(ParseSubArea area)
@@ -43,13 +43,13 @@ public class ParseArea {
 		tileID = blockmap.registerBlock(tileType);
 	}
 	
-	public void addModifier(String modName)
+	public void addModifierGroup(String modName)
 	{
-		modifiers.add(modName);
+		modifierGroups.add(modName);
 	}
 	
 	public TreeNodeArea toAreaNode()
 	{
-		return new TreeNodeArea(subAreas,tileID,identifier,modifiers);
+		return new TreeNodeArea(subAreas,tileID,identifier,modifierGroups);
 	}
 }

@@ -37,6 +37,14 @@ public class ALEQueueElement {
 			return (float) Math.cos(v);
 		case TANGENT:
 			return (float) Math.tan(v);
+		case ARCSINE:
+			return (float) Math.asin(v);
+		case ARCCOSINE:
+			return (float) Math.acos(v);
+		case ARCTANGENT:
+			return (float) Math.atan(v);
+		case SQRT:
+			return (float) Math.sqrt(v);
 		}
 		return null;
 	}
