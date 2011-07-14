@@ -4,7 +4,7 @@
 options
 {
   JDK_VERSION = "1.5";
-  static = true;
+  static = false;
 }
 
 PARSER_BEGIN(RuleParser)
@@ -28,7 +28,7 @@ public class RuleParser
     ExceptionLogger.log("Reading input...", LoggerLevel.COARSE);
     try
     {
-      ParseList list = RuleParser.parseRoot();
+      ParseList list = parser.parseRoot();
       ExceptionLogger.log("No syntactic errors detected", LoggerLevel.COARSE);
       return list;
     }
