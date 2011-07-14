@@ -1,6 +1,6 @@
 Modifier Worley {
 	ModType = Worley
-	count = 10;
+	count = 20;
 }
 
 Modifier Perlin {
@@ -19,7 +19,7 @@ ModifierGroup Worley {
 	Modifier Worley
 	Modifier Perlin
 	Modifier Metaball
-	result = Metaball*Perlin*sqrt(Worley)/10;
+	result = ((1.0*(yPos - minY))/(maxY-minY))*Metaball*Perlin*sqrt(Worley)/10;
 	Prob 1 = 1
 	Type 1 = None
 	Prob 2 = 10

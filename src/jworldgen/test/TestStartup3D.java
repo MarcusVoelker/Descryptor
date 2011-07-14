@@ -3,6 +3,8 @@ package jworldgen.test;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glEnable;
 import jworldgen.exceptionHandler.CriticalFailure;
+import jworldgen.exceptionHandler.ExceptionLogger;
+import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.generator.Generator;
 import jworldgen.generator.World;
 
@@ -70,6 +72,42 @@ public class TestStartup3D {
 			glEnable(GL_DEPTH_TEST);
 			GL11.glCullFace(GL11.GL_FRONT); // Doesn't draw back faces
 			float angle = 0.01f;
+			byte[][][] drawThis = new byte[world.getWidth()][world.getHeight()][world.getDepth()];
+			for (int i = 0; i < world.getWidth(); i++) 
+			{
+				for (int j = 0; j < world.getHeight(); j++) 
+				{
+					for (int k = 0; k < world.getDepth(); k++) 
+					{
+						drawThis[i][j][k] = (byte) (world.getValue(i, j, k) == 0 ? 0 : 1);
+					}
+				}
+			}
+			for (int i = 1; i < world.getWidth()-1; i++) 
+			{
+				for (int j = 1; j < world.getHeight()-1; j++) 
+				{
+					for (int k = 1; k < world.getDepth()-1; k++) 
+					{
+						if (drawThis[i][j][k] == 1)
+						{
+							drawThis[i][j][k] = 2;
+							if (drawThis[i+1][j][k] == 0)
+								drawThis[i][j][k] = 1;
+							else if (drawThis[i-1][j][k] == 0)
+								drawThis[i][j][k] = 1;
+							else if (drawThis[i][j+1][k] == 0)
+								drawThis[i][j][k] = 1;
+							else if (drawThis[i][j-1][k] == 0)
+								drawThis[i][j][k] = 1;
+							else if (drawThis[i][j][k+1] == 0)
+								drawThis[i][j][k] = 1;
+							else if (drawThis[i][j][k-1] == 0)
+								drawThis[i][j][k] = 1;
+						}
+					}
+				}
+			}
 			while(!Display.isCloseRequested())
 			{
 				// Clear the screen and depth buffer
@@ -77,71 +115,73 @@ public class TestStartup3D {
 				GL11.glTranslatef(0, -15, -3*world.getDepth());
 				GL11.glRotatef(angle, 0, 1, 0);
 				GL11.glTranslatef(-0.5f*world.getWidth(), 0.5f*world.getHeight(),0);
-				for (int k = cuttingDepth; k < world.getDepth() - cuttingDepth; k++)
+
+				for (int i = cuttingDepth; i < world.getWidth() - cuttingDepth; i++) 
 				{
-					GL11.glTranslatef(0.0f, 0.0f, -k);
-					for (int i = cuttingDepth; i < world.getWidth() - cuttingDepth; i++)
+					GL11.glTranslatef(i, 0.0f, 0.0f);
+					for (int j = cuttingDepth; j < world.getHeight() - cuttingDepth; j++) 
 					{
-						GL11.glTranslatef(i, 0.0f, 0.0f);
-						for (int j = cuttingDepth; j < world.getHeight() - cuttingDepth; j++)
+						GL11.glTranslatef(0.0f, -j, 0.0f);
+						for (int k = cuttingDepth; k < world.getDepth() - cuttingDepth; k++) 
 						{
-							int color = world.getValue(i, j, k);
-							if (color != 0)
+							GL11.glTranslatef(0.0f, 0.0f, -k);
+							if (drawThis[i][j][k] == 1) 
 							{
-								GL11.glTranslatef(0.0f, -j, 0.0f);
-								setColor(color,0.5f,color/10.0f,10);
-								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+								int color = world.getValue(i, j, k);
+								setColor(color, 0.5f, color / 10.0f, 10);
+								GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK,
+										GL11.GL_FILL);
 								// draw quad
 								glEnable(GL11.GL_CULL_FACE);
-								glEnable( GL11.GL_POLYGON_OFFSET_FILL );
-								GL11.glPolygonOffset( 1, 1 );
+								glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+								GL11.glPolygonOffset(1, 1);
 								GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
-								    GL11.glVertex3f(1,1,0);
-								    GL11.glVertex3f(0,1,0);
-								    GL11.glVertex3f(1,0,0);
-								    GL11.glVertex3f(0,0,0);
-								    GL11.glVertex3f(0,0,1);
-								    GL11.glVertex3f(0,1,0);
-								    GL11.glVertex3f(0,1,1);
-								    GL11.glVertex3f(1,1,0);
-								    GL11.glVertex3f(1,1,1);
-								    GL11.glVertex3f(1,0,0);
-								    GL11.glVertex3f(1,0,1);
-								    GL11.glVertex3f(0,0,1);
-								    GL11.glVertex3f(1,1,1);
-								    GL11.glVertex3f(0,1,1);
+									GL11.glVertex3f(1, 1, 0);
+									GL11.glVertex3f(0, 1, 0);
+									GL11.glVertex3f(1, 0, 0);
+									GL11.glVertex3f(0, 0, 0);
+									GL11.glVertex3f(0, 0, 1);
+									GL11.glVertex3f(0, 1, 0);
+									GL11.glVertex3f(0, 1, 1);
+									GL11.glVertex3f(1, 1, 0);
+									GL11.glVertex3f(1, 1, 1);
+									GL11.glVertex3f(1, 0, 0);
+									GL11.glVertex3f(1, 0, 1);
+									GL11.glVertex3f(0, 0, 1);
+									GL11.glVertex3f(1, 1, 1);
+									GL11.glVertex3f(0, 1, 1);
 								GL11.glEnd();
-								GL11.glDisable( GL11.GL_POLYGON_OFFSET_FILL );
-								GL11.glColor3f(0.05f,0.05f,0.05f);
+								GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
+								GL11.glColor3f(0.05f, 0.05f, 0.05f);
 								GL11.glDisable(GL11.GL_CULL_FACE);
-								GL11.glPolygonMode( GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+								GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 								// draw quad
 								GL11.glBegin(GL11.GL_LINE_STRIP);
-								    GL11.glVertex3f(0,0,0);
-								    GL11.glVertex3f(0,1,0);
-								    GL11.glVertex3f(1,1,0);
-								    GL11.glVertex3f(1,0,0);
-								    GL11.glVertex3f(0,0,0);
-								    GL11.glVertex3f(0,0,1);
-								    GL11.glVertex3f(0,1,1);
-								    GL11.glVertex3f(1,1,1);
-								    GL11.glVertex3f(1,0,1);
-								    GL11.glVertex3f(0,0,1);
+									GL11.glVertex3f(0, 0, 0);
+									GL11.glVertex3f(0, 1, 0);
+									GL11.glVertex3f(1, 1, 0);
+									GL11.glVertex3f(1, 0, 0);
+									GL11.glVertex3f(0, 0, 0);
+									GL11.glVertex3f(0, 0, 1);
+									GL11.glVertex3f(0, 1, 1);
+									GL11.glVertex3f(1, 1, 1);
+									GL11.glVertex3f(1, 0, 1);
+									GL11.glVertex3f(0, 0, 1);
 								GL11.glEnd();
 								GL11.glBegin(GL11.GL_LINES);
-									GL11.glVertex3f(1,0,0);
-								    GL11.glVertex3f(1,0,1);
-								    GL11.glVertex3f(0,1,0);
-								    GL11.glVertex3f(0,1,1);
-								    GL11.glVertex3f(1,1,0);
-								    GL11.glVertex3f(1,1,1);
+									GL11.glVertex3f(1, 0, 0);
+									GL11.glVertex3f(1, 0, 1);
+									GL11.glVertex3f(0, 1, 0);
+									GL11.glVertex3f(0, 1, 1);
+									GL11.glVertex3f(1, 1, 0);
+									GL11.glVertex3f(1, 1, 1);
 								GL11.glEnd();
-								GL11.glTranslatef(0.0f, j, 0.0f);
 							}
+							GL11.glTranslatef(0.0f, 0.0f, k);			
 						}
-						GL11.glTranslatef(-i, 0.0f, 0.0f);
+						GL11.glTranslatef(0.0f, j, 0.0f);
 					}
-					GL11.glTranslatef(0.0f, 0.0f, k);
+					GL11.glTranslatef(-i, 0.0f, 0.0f);
 				}
 				Display.update();
 				GL11.glTranslatef(0.5f*world.getWidth(), -0.5f*world.getHeight(),0);

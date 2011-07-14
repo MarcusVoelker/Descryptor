@@ -145,6 +145,15 @@ public class ModifierGroup {
 			String key = e.nextElement();
 			resolver.setVariable(key, modifiers.get(key).getValue(x, y, z));
 		}
+		resolver.setVariable("xPos", x);
+		resolver.setVariable("yPos", y);
+		resolver.setVariable("zPos", z);
+		resolver.setVariable("minX", minX);
+		resolver.setVariable("minY", minY);
+		resolver.setVariable("minZ", minZ);
+		resolver.setVariable("maxX", maxX);
+		resolver.setVariable("maxY", maxY);
+		resolver.setVariable("maxZ", maxZ);
 		if (assignments != null)
 		{
 			for (ParseAssignment assignment : assignments)
