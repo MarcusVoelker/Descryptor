@@ -11,7 +11,7 @@ Modifier Perlin {
 Modifier Metaball {
 	ModType = Metaball
 	count = 10;
-	threshold = 0.3;
+	threshold = 0.01;
 }
 
 ModifierGroup Worley {
@@ -19,9 +19,13 @@ ModifierGroup Worley {
 	Modifier Worley
 	Modifier Perlin
 	Modifier Metaball
-	result = ((1.0*(yPos - minY))/(maxY-minY))*Metaball*Perlin*sqrt(Worley)/10;
+	attractY = maxY;
+	attractDist = 0.8*abs(attractY - yPos);
+	height = maxY - minY;
+	attractCloseness = 1-attractDist/height;
+	result = attractCloseness*sqrt(Perlin)*sqrt(Worley)/10;
 	Prob 1 = 1
-	Type 1 = None
+	Type 1 = Type1
 	Prob 2 = 10
 	Type 2 = Type2
 	Prob 3 = 10
@@ -44,5 +48,33 @@ ModifierGroup Worley {
 
 Area World {
 	Type = None
+	SubArea {
+		AreaType = Sea
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.5;
+		zPos = 0.0;
+		width = 1.0;
+		height = 0.5;
+		depth = 1.0;
+	}
+	SubArea {
+		AreaType = Land
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.0;
+		zPos = 0.0;
+		width = 1.0;
+		height = 1.0;
+		depth = 1.0;
+	}
+}
+
+Area Land {
+	Type = None
 	ModifierGroup Worley
+}
+
+Area Sea {
+	Type = Water
 }

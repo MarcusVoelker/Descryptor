@@ -161,16 +161,16 @@ public class ModifierGroup {
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		int curProb = probSum;
+		int curProb = 0;
 		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
 		{
 			int key = e.nextElement();
-			curProb -= probabilities.get(key);
-			if (curProb/(float)probSum <= resolver.getVariable("result").floatValue())
+			curProb += probabilities.get(key);
+			if (curProb/(float)probSum >= resolver.getVariable("result").floatValue())
 			{
 				return typeIDs.get(key);
 			}
 		}
-		return 0;
+		return typeIDs.get(1);
 	}
 }

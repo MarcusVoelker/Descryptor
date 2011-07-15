@@ -115,6 +115,7 @@ TOKEN: /* ALE Functions */
 | < ACOS: "acos" >
 | < ATAN: "atan" >
 | < SQRT: "sqrt" >
+| < ABS: "abs" >
 }
 TOKEN : /* Misc Identifiers */
 {
@@ -422,6 +423,8 @@ void aleFunction(Stack opStack):
 	  t = < ATAN > { type = ALEElementType.ARCTANGENT; }
 	|
 	  t = < SQRT > { type = ALEElementType.SQRT; }
+	|
+	  t = < ABS > { type = ALEElementType.ABSOLUTE; }
 	)
 	{
 		opStack.push(new ALEQueueElement(t.image,type));

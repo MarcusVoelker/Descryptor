@@ -54,9 +54,9 @@ public class MetaballModifier extends Modifier {
 		for (int i = 0; i < xPos.size(); i++)
 		{
 			float tempVal = 0;
-			tempVal += Math.abs(x-xPos.get(i));
-			tempVal += Math.abs(y-yPos.get(i));
-			tempVal += Math.abs(z-zPos.get(i));
+			tempVal += (x-xPos.get(i))*(x-xPos.get(i));
+			tempVal += (y-yPos.get(i))*(y-yPos.get(i));
+			tempVal += (z-zPos.get(i))*(z-zPos.get(i));
 				value += 1/tempVal;
 		}
 		

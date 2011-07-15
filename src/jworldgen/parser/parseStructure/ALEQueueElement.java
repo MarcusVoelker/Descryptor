@@ -45,6 +45,8 @@ public class ALEQueueElement {
 			return (float) Math.atan(v);
 		case SQRT:
 			return (float) Math.sqrt(v);
+		case ABSOLUTE:
+			return (float) Math.abs(v);
 		}
 		return null;
 	}
@@ -87,7 +89,7 @@ public class ALEQueueElement {
 	
 	public Number toValue(Number v, RNG rng)
 	{
-		return toFloat((Float) v, rng);
+		return toFloat(v.floatValue(), rng);
 	}
 	
 	public Number toValue(Number v1, Number v2, RNG rng)
