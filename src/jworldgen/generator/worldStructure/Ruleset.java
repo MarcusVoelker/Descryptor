@@ -86,9 +86,9 @@ public class Ruleset
 		return world;
 	}
 	
-	public BlockMap getBlockMap()
+	public Hashtable<Integer,String> getBlockMap()
 	{
-		return blockMap;
+		return blockMap.getInverseMap();
 	}
 	
 	public void expandToWorldTree(RNG rng)

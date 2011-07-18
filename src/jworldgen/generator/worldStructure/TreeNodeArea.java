@@ -135,11 +135,11 @@ public class TreeNodeArea {
 		return newArea;
 	}
 	
-	protected  int calculateCount(RNG rng)
+	protected int calculateCount(RNG rng)
 	{
 		VariableResolver resolver = new VariableResolver();
-		resolver.setVariable("$i", 0);
-		resolver.setVariable("$n", 0);
+		resolver.setVariable("$i", 1);
+		resolver.setVariable("$n", 1);
 		if (assignments != null)
 		{
 			for (ParseAssignment assignment : assignments)

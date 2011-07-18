@@ -1,5 +1,6 @@
 package jworldgen.parser.parseStructure;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class BlockMap {
@@ -30,4 +31,14 @@ public class BlockMap {
 		}
 	}
 	
+	public Hashtable<Integer,String> getInverseMap()
+	{
+		Hashtable<Integer,String> inverseMap = new Hashtable<Integer,String>();
+		for (Enumeration<String> e = blockMap.keys(); e.hasMoreElements();)
+		{
+			String key = e.nextElement();
+			inverseMap.put(blockMap.get(key), key);
+		}
+		return inverseMap;
+	}
 }

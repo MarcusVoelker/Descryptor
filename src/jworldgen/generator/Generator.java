@@ -1,5 +1,7 @@
 package jworldgen.generator;
 
+import java.util.Hashtable;
+
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
@@ -8,6 +10,7 @@ import jworldgen.generator.worldStructure.Ruleset;
 import jworldgen.generator.worldStructure.TreeNodeArea;
 import jworldgen.generator.worldStructure.VoxelStack;
 import jworldgen.parser.RuleParser;
+import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
 
 public class Generator {
@@ -85,5 +88,10 @@ public class Generator {
 		Generator gen = new Generator(rules, new RNG().nextInt(0, Integer.MAX_VALUE));
 		World world = gen.generateRandomly(width, height, depth);
 		return world;
+	}
+	
+	public Hashtable<Integer,String> getBlockMap()
+	{
+		return rules.getBlockMap();
 	}
 }

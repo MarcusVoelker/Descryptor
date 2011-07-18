@@ -1,19 +1,18 @@
 Modifier Stone {
 	ModType = Perlin
-	scale = 128;
+	scale = 64;
 }
 
 ModifierGroup Stone {
 	ChangeType = Modify
 	Modifier Stone
-	Modifier Iron
-	result = sin(Stone*Iron);
+	result = Stone;
 	Prob 1 = 1
 	Type 1 = Stone
-	Prob 2 = 3
+	Prob 2 = 1
 	Type 2 = None
-	Prob 3 = 4
-	Type 3 = CrackedStone
+	Prob 3 = 1
+	Type 3 = Coal
 }
 
 Modifier Iron {
@@ -110,13 +109,13 @@ Area Sky {
 	SubArea {
 		AreaType = Blob
 		count = 4:12;
-		rand = 6.28*$i/$n;
+		rand = (6.28*$i)/$n;
 		xPos = 0.45+0.5*sin(rand);
 		yPos = 0.45+0.5*cos(rand);
-		zPos = 0.0:0.9;
+		zPos = 0.0;
 		width = 0.1;
 		height = 0.1;
-		depth = 0.1;
+		depth = 1.0;
 	}
 }
 

@@ -43,6 +43,28 @@ public class RuleParser
       return null;
     }
   }
+
+  public static ParseALE parseALE(String aleCode) throws CriticalFailure
+  {
+    StringReader reader = new StringReader(aleCode);
+    RuleParser parser = new RuleParser(reader);
+    
+    try
+    {
+      ParseALE ale = parser.ale();
+      return ale;
+    }
+    catch (Exception e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+    catch (Error e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+  }
 }
 
 PARSER_END(RuleParser)
