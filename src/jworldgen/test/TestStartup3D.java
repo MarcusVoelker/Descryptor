@@ -129,18 +129,14 @@ public class TestStartup3D {
 			GL11.glMatrixMode(GL11.GL_MODELVIEW);
 			glEnable(GL_DEPTH_TEST);
 			GL11.glCullFace(GL11.GL_FRONT); // Doesn't draw back faces
-			float angle1 = 0;
-			float angle2 = 0;
-			float angle3 = 0;
+			GL11.glTranslatef(0, -10, -3*world.getDepth());
+			GL11.glRotatef(20, 1, 0, 0);
+			GL11.glPushMatrix();
 			while(!Display.isCloseRequested())
 			{
 				// Clear the screen and depth buffer
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 				GL11.glPushMatrix();
-				GL11.glTranslatef(0, -10, -3*world.getDepth());
-				GL11.glRotatef(angle1, 0, 1, 0);
-				GL11.glRotatef(angle2, 1, 0, 0);
-				GL11.glRotatef(angle3, 0, 0, 1);
 				GL11.glTranslatef(-0.5f*world.getWidth(), 0.5f*world.getHeight(),0.5f*world.getDepth());
 
 				for (int i = cuttingDepth; i < world.getWidth() - cuttingDepth; i++) 
@@ -218,22 +214,21 @@ public class TestStartup3D {
 				boolean leftPressed   = hasInput(Keyboard.KEY_LEFT);
 				boolean rightPressed   = hasInput(Keyboard.KEY_RIGHT);
 				if (Keyboard.isKeyDown(Keyboard.KEY_A))
-					angle1-= ROT_SPEED;
+					GL11.glRotatef(-ROT_SPEED, 0, 1, 0);
 				if (Keyboard.isKeyDown(Keyboard.KEY_D))
-					angle1+= ROT_SPEED;
+					GL11.glRotatef(ROT_SPEED, 0, 1, 0);
 				if (Keyboard.isKeyDown(Keyboard.KEY_W))
-					angle2-= ROT_SPEED;
+					GL11.glRotatef(-ROT_SPEED, 1, 0, 0);
 				if (Keyboard.isKeyDown(Keyboard.KEY_S))
-					angle2+= ROT_SPEED;
+					GL11.glRotatef(ROT_SPEED, 1, 0, 0);
 				if (Keyboard.isKeyDown(Keyboard.KEY_Q))
-					angle3-= ROT_SPEED;
+					GL11.glRotatef(-ROT_SPEED, 0, 0, 1);
 				if (Keyboard.isKeyDown(Keyboard.KEY_E))
-					angle3+= ROT_SPEED;
+					GL11.glRotatef(ROT_SPEED, 0, 0, 1);
 				if (Keyboard.isKeyDown(Keyboard.KEY_R))
 				{
-					angle1 = 0;
-					angle2 = 0;
-					angle3 = 0;
+					GL11.glPopMatrix();
+					GL11.glPushMatrix();
 					load();
 				}
 				if (Keyboard.isKeyDown(Keyboard.KEY_T))
