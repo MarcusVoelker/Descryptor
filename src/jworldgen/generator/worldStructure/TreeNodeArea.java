@@ -229,11 +229,7 @@ public class TreeNodeArea {
 			switch(mod.getChangeType())
 			{
 			case MODIFY:
-				if (value != 0)
-				{
-					stack.pop();
-					stack.push(value);
-				}
+				stack.modify(value);
 				break;
 			case STACK:
 				stack.push(value);

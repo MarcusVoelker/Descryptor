@@ -10,6 +10,21 @@ public class VoxelStack {
 		stack = new Stack<Integer>();
 	}
 	
+	public void modify(int value)
+	{
+		if (stack.empty())
+		{
+			stack.push(value);
+			return;
+		}
+		if (value == 0)
+			return;
+		if (stack.peek() != -3 || value == -4)
+		{
+			stack.pop();
+			stack.push(value);
+		}
+	}
 	public int pop()
 	{
 		if (!stack.empty())
