@@ -1,7 +1,6 @@
 package jworldgen.generator.worldStructure;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
