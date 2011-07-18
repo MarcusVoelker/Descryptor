@@ -17,6 +17,7 @@ ModifierGroup Worley {
 	height = maxY - minY;
 	attractCloseness = 1-attractDist/height;
 	result = attractCloseness*sqrt(Perlin)*sqrt(Worley)/10;
+	result = result + ((yPos == height/2) && (result > 0.45) && (result < 0.55));
 	Prob 1 = 1
 	Type 1 = Type1
 	Prob 2 = 10
@@ -33,7 +34,7 @@ ModifierGroup Worley {
 	Type 7 = Type7
 	Prob 8 = 10
 	Type 8 = Type8
-	Prob 9 = 10
+	Prob 9 = 20
 	Type 9 = Type9
 	Prob 10 = 100
 	Type 10 = None

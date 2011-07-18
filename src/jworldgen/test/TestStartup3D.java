@@ -20,6 +20,7 @@ public class TestStartup3D {
 	private static int cuttingDepth = 0;
 	private static boolean pressed = false;
 	private static String levelName = "data/WorleyRules.txt";
+	private static boolean drawWater = true;
 	private static void setColor(int hue, float sat, float val, int max)
 	{
 		int h = 6*hue/max;
@@ -71,6 +72,8 @@ public class TestStartup3D {
 				for (int k = cuttingDepth; k < world.getDepth() - cuttingDepth; k++) 
 				{
 					drawThis[i][j][k] = (byte) (world.getValue(i, j, k) == 0 ? 0 : 1);
+					if (!drawWater && world.getValue(i, j, k) == 1)
+						drawThis[i][j][k] = 0;
 				}
 			}
 		}
@@ -232,6 +235,11 @@ public class TestStartup3D {
 					angle2 = 0;
 					angle3 = 0;
 					load();
+				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_T))
+				{
+					drawWater = !drawWater;
+					setDrawingStates();
 				}
 				if (leftPressed && !pressed) {
 					cuttingDepth++;

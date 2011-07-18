@@ -104,6 +104,18 @@ TOKEN: /* ALE Operators */
 | < MULTIPLY : "*" >
 | < DIVIDE : "/" >
 | < RANDOM : ":" >
+| < EQUALS : "==" >
+| < NEQUALS : "!=" >
+| < GREATER : " >" >
+| < GOE : " >=" >
+| < LESS : "< " >
+| < LOE : "<=" >
+| < AND : "&&" >
+| < OR : "||" >
+| < NOT : "!" >
+| < BIT_AND : "&" >
+| < BIT_OR : "|" >
+| < BIT_NOT : "~" >
 }
 
 TOKEN: /* ALE Functions */
@@ -371,41 +383,46 @@ void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
 {Token t; ALEElementType type;}
 {
-	(
-	  t = < PLUS > { type = ALEElementType.PLUS; }
-	|
-	  t = < MINUS > { type = ALEElementType.MINUS; }
-	)
-	{
-		while (!opStack.empty() && !opStack.peek().equals("("))
+  	(
+  	  t = < EQUALS > { type = ALEElementType.EQUALS; }	|   	  t = < NEQUALS > { type = ALEElementType.NEQUALS; }
+  	|
+  	  t = < GREATER > { type = ALEElementType.GREATER; }
+	| 
+  	  t = < GOE > { type = ALEElementType.GOE; }
+  	|
+  	  t = < LESS > { type = ALEElementType.LESS; }
+	| 
+  	  t = < LOE > { type = ALEElementType.LOE; }
+  	| 
+  	  t = < NOT > { type = ALEElementType.NOT; }
+  	| 
+  	  t = < BIT_NOT > { type = ALEElementType.BITWISE_NOT; }
+  	| 
+  	  t = < AND > { type = ALEElementType.AND; }
+  	| 
+  	  t = < BIT_AND > { type = ALEElementType.BITWISE_AND; }
+  	| 
+  	  t = < OR > { type = ALEElementType.OR; }
+  	| 
+  	  t = < BIT_OR > { type = ALEElementType.BITWISE_OR; }
+  	| 
+  	  t = < PLUS > { type = ALEElementType.PLUS; }
+  	| 
+  	  t = < MINUS > { type = ALEElementType.MINUS; }
+  	| 
+  	  t = < MULTIPLY > { type = ALEElementType.MULTIPLY; }
+  	| 
+  	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
+  	| 
+  	  t = < RANDOM > { type = ALEElementType.RANDOM; }
+  	)
+  	{		while (!opStack.empty() && !opStack.peek().equals("(") && ((ALEQueueElement) opStack.peek()).type.priority < type.priority)
 		{
 		  output.add((ALEQueueElement) opStack.pop());
 		}
-		opStack.push(new ALEQueueElement(t.image,type));
-	}
-
-|   (
-	  t = < MULTIPLY > { type = ALEElementType.MULTIPLY; }
-	|
-	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
-	)
-	{
-		while (!opStack.empty() && !opStack.peek().equals("(") &&((ALEQueueElement) opStack.peek()).type != ALEElementType.PLUS && ((ALEQueueElement) opStack.peek()).type != ALEElementType.MINUS)
-		{
-			output.add((ALEQueueElement) opStack.pop());
-		}
-		opStack.push(new ALEQueueElement(t.image,type));
-	}
-|   t = < RANDOM >
-	{
-		while (!opStack.empty() && ((ALEQueueElement) opStack.peek()).type != ALEElementType.RANDOM)
-		{
-			output.add((ALEQueueElement) opStack.pop());
-		}
-		opStack.push(new ALEQueueElement(t.image,ALEElementType.RANDOM));
-	}
-}
-
+		opStack.push(new ALEQueueElement(t.image,type));	
+  	}
+ }
 void aleFunction(Stack opStack):
 {Token t; ALEElementType type;}
 {
