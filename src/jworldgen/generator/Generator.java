@@ -1,13 +1,12 @@
 package jworldgen.generator;
 
-import java.util.Stack;
-
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
 import jworldgen.exceptionHandler.LoggerLevel;
 import jworldgen.filehandler.TextFileReader;
 import jworldgen.generator.worldStructure.Ruleset;
 import jworldgen.generator.worldStructure.TreeNodeArea;
+import jworldgen.generator.worldStructure.VoxelStack;
 import jworldgen.parser.RuleParser;
 import jworldgen.parser.parseStructure.ParseList;
 
@@ -45,37 +44,9 @@ public class Generator {
 	
 	public void calculateBlock(World world, int x, int y, int z)
 	{
-		Stack<Integer> stack = new Stack<Integer>();
+		VoxelStack stack = new VoxelStack();
 		this.world.setValue(new RNG(seed,x,y,z), stack, x, y, z);
-		while(!stack.empty() && stack.peek() < 1)
-		{
-			switch(stack.pop())
-			{
-			case 0:
-				break;
-			case -1:
-				stack.push(-1);
-				world.setValue(x, y, z, 0);
-				return;
-			case -2:
-				while(!stack.empty() && stack.peek() == 0)
-					stack.pop();
-				if (!stack.empty())
-					stack.pop();
-			case -3:
-				break;
-			case -4:
-				if (stack.peek() == -3)
-					stack.pop();
-				break;
-			}
-		}
-		if (stack.empty())
-		{
-			world.setValue(x, y, z, 0);
-			return;
-		}
-		world.setValue(x, y, z, stack.peek());
+		world.setValue(x, y, z, stack.evaluate());
 	}
 	
 	public World createWorld(int width, int height, int depth)

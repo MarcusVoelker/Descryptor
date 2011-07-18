@@ -117,7 +117,7 @@ public class TestStartup3D {
 	public static void main(String[] args)
 	{
 		try {
-			Display.setDisplayMode(new DisplayMode(800,800));
+			Display.setDisplayMode(new DisplayMode(1000,1000));
 			Display.create();
 			load();
 			GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -134,7 +134,7 @@ public class TestStartup3D {
 				// Clear the screen and depth buffer
 				GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 				GL11.glPushMatrix();
-				GL11.glTranslatef(0, -15, -3*world.getDepth());
+				GL11.glTranslatef(0, -10, -3*world.getDepth());
 				GL11.glRotatef(angle1, 0, 1, 0);
 				GL11.glRotatef(angle2, 1, 0, 0);
 				GL11.glRotatef(angle3, 0, 0, 1);

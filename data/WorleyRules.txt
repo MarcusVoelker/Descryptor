@@ -10,10 +10,19 @@ Modifier Perlin {
 
 Modifier Metaball {
 	ModType = Metaball
-	count = 10;
-	threshold = 0.01;
+	count = 30;
+	threshold = 0.05;
 }
 
+ModifierGroup Metaballs {
+	ChangeType = Stack
+	Modifier Metaball
+	result = Metaball*0.7;
+	Prob 1 = 1
+	Type 1 = None
+	Prob 2 = 1
+	Type 2 = Lock
+}
 ModifierGroup Worley {
 	ChangeType = Modify
 	Modifier Worley
@@ -77,4 +86,5 @@ Area Land {
 
 Area Sea {
 	Type = Water
+	ModifierGroup Metaballs
 }

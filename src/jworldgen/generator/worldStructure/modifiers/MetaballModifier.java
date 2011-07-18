@@ -27,7 +27,7 @@ public class MetaballModifier extends Modifier {
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		threshold = (Float) resolver.getVariable("threshold");
+		threshold = resolver.getVariable("threshold").floatValue();
 	}
 	@Override
 	public Modifier clone() {

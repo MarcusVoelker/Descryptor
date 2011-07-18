@@ -221,7 +221,7 @@ public class TreeNodeArea {
 		subAreas = realSubAreas;
 	}
 	
-	private void determineValue(RNG rng, Stack<Integer> stack, int x, int y, int z)
+	private void determineValue(RNG rng, VoxelStack stack, int x, int y, int z)
 	{
 		stack.push(tileID);
 		for (ModifierGroup mod : modifierGroups)
@@ -251,40 +251,9 @@ public class TreeNodeArea {
 			{
 				for (int z = minZ; z < maxZ; z++)
 				{
-					Stack<Integer> stack = new Stack<Integer>();
+					VoxelStack stack = new VoxelStack();
 					setValue(new RNG(seed,x,y,z),stack,x,y,z);
-					boolean breakLoop = false;
-					while(!stack.empty() && stack.peek() < 1 && !breakLoop)
-					{
-						switch(stack.pop())
-						{
-						case 0:
-							break;
-						case -1:
-							stack.push(-1);
-							breakLoop = true;
-							break;
-						case -2:
-							while(!stack.empty() && stack.peek() == 0)
-								stack.pop();
-							if (!stack.empty())
-								stack.pop();
-						case -3:
-							break;
-						case -4:
-							if (stack.peek() == -3)
-								stack.pop();
-							break;
-						}
-					}
-					if (stack.empty() || stack.peek() < 1)
-					{
-						world.setValue(x, y, z, 0);
-					}
-					else
-					{
-						world.setValue(x, y, z, stack.peek());
-					}
+					world.setValue(x, y, z, stack.evaluate());
 				}
 			}
 		}
@@ -309,7 +278,7 @@ public class TreeNodeArea {
 		}
 	}
 	
-	public void setValue(RNG rng, Stack<Integer> stack, int x, int y, int z)
+	public void setValue(RNG rng, VoxelStack stack, int x, int y, int z)
 	{
 		if (x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ)
 			determineValue(rng,stack,x,y,z);
