@@ -107,7 +107,8 @@ TOKEN : /* Room Keys */
 
 TOKEN : /* Modifier and Area Keys */
 {
-  < PROB : "Prob" >
+  < DRAW : "Draw" >
+| < IF : "if" >
 | < TYPE : "Type" >
 | < MODTYPE : "ModType" >
 | < CHANGETYPE : "ChangeType" >
@@ -125,6 +126,7 @@ TOKEN: /* ALE Operators */
 | < MINUS : "-" >
 | < MULTIPLY : "*" >
 | < DIVIDE : "/" >
+| < MODULO : "%" >
 | < RANDOM : ":" >
 | < EQUALS : "==" >
 | < NEQUALS : "!=" >
@@ -216,32 +218,18 @@ void modifierLine(ParseModifier modifier) :
 }
 
 void modifierGroupLine(ParseModifierGroup modifierGroup) :
-{Token probType; Token id; ParseAssignment assignment;}
+{Token type; ParseALE ale; ParseAssignment assignment;}
 {
-  
-  < TYPE > 
-  (
-    id = < INTEGER > "=" probType = < IDENT >
-    {
-      modifierGroup.addType(probType.image, Integer.parseInt(id.image));
-    }
-  |
-  	"=" probType = < IDENT >
-  	{
-      modifierGroup.addType(probType.image, 0);
-    }
-  )  
-| < PROB > id = < INTEGER > "=" probType = < INTEGER >
+  < DRAW > type = < IDENT > < IF > ale = ale()
+  {	modifierGroup.addType(ale, type.image);
+  } 
+| < CHANGETYPE > "=" type = < IDENT >
   {
-    modifierGroup.addProb(Integer.parseInt(probType.image), Integer.parseInt(id.image));
+    modifierGroup.setChangeType(type.image);
   }
-| < CHANGETYPE > "=" probType = < IDENT >
+| < MODIFIER > type = < IDENT >
   {
-    modifierGroup.setChangeType(probType.image);
-  }
-| < MODIFIER > probType = < IDENT >
-  {
-    modifierGroup.addModifier(probType.image);
+    modifierGroup.addModifier(type.image);
   }
 | assignment = assignment()
   {
@@ -333,24 +321,6 @@ ParseModifierGroup modifierGroup():
   }
 }
 
-int prob():
-{Token id;}
-{
-	< PROB > id = < INTEGER >
-	{
-		return Integer.parseInt(id.image);
-	}	
-}
-
-int type():
-{Token id;}
-{
-  < TYPE > id = < INTEGER >
-	{
-		return Integer.parseInt(id.image);
-	}
-}
-
 ParseAssignment assignment():
 {Token t; ParseALE ale;}
 {
@@ -436,6 +406,8 @@ void aleOperator(LinkedList<ALEQueueElement> output, Stack opStack):
   	| 
   	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
   	| 
+  	  t = < MODULO > { type = ALEElementType.MODULO; }
+  	|
   	  t = < RANDOM > { type = ALEElementType.RANDOM; }
   	)
   	{		while (!opStack.empty() && !opStack.peek().equals("(") && ((ALEQueueElement) opStack.peek()).type.priority < type.priority)

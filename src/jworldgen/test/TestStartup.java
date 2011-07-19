@@ -138,8 +138,8 @@ public class TestStartup {
 		try {
 			long seed = (long) Math.floor((Math.random()*Long.MAX_VALUE));
 			Display.setTitle("Seed: "+Util.seedToSeedString(seed));
-			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
-			world = gen.generateRandomly(50,50,50);
+			Generator gen = Generator.getGeneratorFromFile("data/TestRules.txt", seed);
+			world = gen.generateRandomly(200,200,1);
 			drawThis = new byte[world.getWidth()][world.getHeight()][world.getDepth()];
 			blockMap = gen.getBlockMap();
 			setDrawingStates();
@@ -334,7 +334,7 @@ public class TestStartup {
 		}
 	}
 	
-	static boolean use3D = true;
+	static boolean use3D = false;
 	public static void main(String[] args)
 	{
 		try {

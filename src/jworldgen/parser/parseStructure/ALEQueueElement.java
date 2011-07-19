@@ -84,6 +84,8 @@ public class ALEQueueElement {
 			return v1.intValue()*v2.intValue();
 		case DIVIDE:
 			return v1.intValue()/v2.intValue();
+		case MODULO:
+			return v1.intValue()/v2.intValue();
 		case RANDOM:
 			return rng.nextInt(v1.intValue(), v2.intValue());
 		case EQUALS:

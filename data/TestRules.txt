@@ -7,12 +7,9 @@ ModifierGroup Stone {
 	ChangeType = Modify
 	Modifier Stone
 	result = Stone;
-	Prob 1 = 1
-	Type 1 = Stone
-	Prob 2 = 1
-	Type 2 = None
-	Prob 3 = 1
-	Type 3 = Coal
+	Draw Stone if result < 0.34;
+	Draw None if result < 0.67;
+	Draw Coal if 1;
 }
 
 Modifier Iron {
@@ -24,10 +21,8 @@ ModifierGroup Iron {
 	ChangeType = Modify
 	Modifier Iron
 	result = Iron;
-	Prob 1 = 2
-	Type 1 = None
-	Prob 2 = 1
-	Type 2 = Iron
+	Draw None if result < 0.67;
+	Draw Iron if 1;
 }
 
 Modifier Gold {
@@ -39,10 +34,8 @@ ModifierGroup Gold {
 	ChangeType = Modify
 	Modifier Gold
 	result = Gold;
-	Prob 1 = 5
-	Type 1 = None
-	Prob 2 = 2
-	Type 2 = Gold
+	Draw None if result < 0.71;
+	Draw Gold if 1;
 }
 
 Modifier SurMod {
@@ -55,12 +48,9 @@ ModifierGroup SurMod {
 	ChangeType = Stack
 	Modifier SurMod
 	result = SurMod;
-	Prob 1 = 3
-	Type 1 = None
-	Prob 2 = 1
-	Type 2 = Sand
-	Prob 3 = 3
-	Type 3 = Erase
+	Draw Erase if result < 0.45;
+	Draw Sand if result < 0.55;
+	Draw None if 1;
 }
 
 Area World {

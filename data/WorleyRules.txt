@@ -17,27 +17,19 @@ ModifierGroup Worley {
 	height = maxY - minY;
 	attractCloseness = 1-attractDist/height;
 	result = attractCloseness*sqrt(Perlin)*sqrt(Worley)/10;
-	result = result + ((yPos == height/2) && (result > 0.45) && (result < 0.55));
-	Prob 1 = 1
-	Type 1 = Type1
-	Prob 2 = 10
-	Type 2 = Type2
-	Prob 3 = 10
-	Type 3 = Type3
-	Prob 4 = 10
-	Type 4 = Type4
-	Prob 5 = 10
-	Type 5 = Type5
-	Prob 6 = 10
-	Type 6 = Type6
-	Prob 7 = 10
-	Type 7 = Type7
-	Prob 8 = 10
-	Type 8 = Type8
-	Prob 9 = 20
-	Type 9 = Type9
-	Prob 10 = 100
-	Type 10 = None
+	
+	Draw Type0 if (yPos == height/2) && (result > 0.55) && (result < 0.65);
+	Draw Type1 if result > 1;
+	Draw Type2 if result > 0.99;
+	Draw Type3 if result > 0.95;
+	Draw Type4 if result > 0.9;
+	Draw Type5 if result > 0.85;
+	Draw Type6 if result > 0.8;
+	Draw Type7 if result > 0.75;
+	Draw Type8 if result > 0.7;
+	Draw Type9 if result > 0.6;
+	Draw None if 1;
+	
 }
 
 Area World {

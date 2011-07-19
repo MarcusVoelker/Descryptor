@@ -1,8 +1,6 @@
 package jworldgen.parser.parseStructure;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
 import jworldgen.exceptionHandler.CriticalFailure;
 import jworldgen.exceptionHandler.ExceptionLogger;
@@ -12,10 +10,10 @@ import jworldgen.generator.worldStructure.ModifierGroup;
 import jworldgen.generator.worldStructure.modifiers.ChangeType;
 
 public class ParseModifierGroup {
-	private Hashtable<Integer,Integer> probabilities;
-	private Hashtable<Integer,String> types;
+	private ArrayList<ParseALE> drawConstraints;
+	private ArrayList<String> types;
 	private ArrayList<String> modifiers;
-	private Hashtable<Integer,Integer> typeIDs;
+	private ArrayList<Integer> typeIDs;
 	
 	public ArrayList<ParseAssignment> assignments;
 	
@@ -24,20 +22,16 @@ public class ParseModifierGroup {
 	
 	public ParseModifierGroup()
 	{
-		probabilities = new Hashtable<Integer,Integer>();
-		types = new Hashtable<Integer,String>();
-		typeIDs = new Hashtable<Integer,Integer>();
+		drawConstraints = new ArrayList<ParseALE>();
+		types = new ArrayList<String>();
+		typeIDs = new ArrayList<Integer>();
 		assignments = new ArrayList<ParseAssignment>();
 		modifiers = new ArrayList<String>();
 	}
-	public void addProb(int value, int id)
+	public void addType(ParseALE ale, String type)
 	{
-		probabilities.put(id, value);
-	}
-	
-	public void addType(String type, int id)
-	{
-		types.put(id, type);
+		drawConstraints.add(ale);
+		types.add(type);
 	}
 	
 	public void addModifier(String name)
@@ -62,11 +56,9 @@ public class ParseModifierGroup {
 	
 	public void insertBlockIDs(BlockMap blockmap)
 	{
-		for (Enumeration<Integer> e = types.keys(); e.hasMoreElements();)
+		for (String type : types)
 		{
-			Integer id = e.nextElement();
-			String tileType = types.get(id);
-			typeIDs.put(id, blockmap.registerBlock(tileType));
+			typeIDs.add(blockmap.registerBlock(type));
 		}
 	}
 	
@@ -87,6 +79,6 @@ public class ParseModifierGroup {
 				chType = ChangeType.MODIFY;
 			}
 		}
-		return new ModifierGroup(identifier, assignments, probabilities, typeIDs, modifiers, chType);
+		return new ModifierGroup(identifier, assignments, drawConstraints, typeIDs, modifiers, chType);
 	}
 }

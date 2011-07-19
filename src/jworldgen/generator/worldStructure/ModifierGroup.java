@@ -18,6 +18,7 @@ import jworldgen.generator.worldStructure.modifiers.PerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.VoronoiModifier;
 import jworldgen.generator.worldStructure.modifiers.WeightedPerlinModifier;
 import jworldgen.generator.worldStructure.modifiers.WorleyModifier;
+import jworldgen.parser.parseStructure.ParseALE;
 import jworldgen.parser.parseStructure.ParseAssignment;
 
 public class ModifierGroup {
@@ -25,42 +26,31 @@ public class ModifierGroup {
 	protected RNG rng;
 	protected int minX,minY,minZ,maxX,maxY,maxZ;
 	protected Hashtable<String,Modifier> modifiers;
-	private Hashtable<Integer,Integer> probabilities;
+	private ArrayList<ParseALE> drawConstraints;
 	private ArrayList<String> modifierNames;
-	private Hashtable<Integer,Integer> typeIDs;
+	private ArrayList<Integer> typeIDs;
 	
 	protected ArrayList<ParseAssignment> assignments;
-	protected int probSum;
 	protected ChangeType changeType;
 	
-	public ModifierGroup(String identifier, ArrayList<ParseAssignment> assignments, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, ArrayList<String> modifierNames, ChangeType changeType)
+	public ModifierGroup(String identifier, ArrayList<ParseAssignment> assignments, ArrayList<ParseALE> drawConstraints, ArrayList<Integer> typeIDs, ArrayList<String> modifierNames, ChangeType changeType)
 	{
 		this.identifier = identifier;
 		this.assignments = assignments;
-		this.probabilities = probabilities;
+		this.drawConstraints = drawConstraints;
 		this.modifierNames = modifierNames;
 		this.typeIDs = typeIDs;
 		this.changeType = changeType;
-		probSum = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			probSum += probabilities.get(e.nextElement());
-		}
 	}
 	
-	public ModifierGroup(String identifier, ArrayList<ParseAssignment> assignments, Hashtable<Integer,Integer> probabilities, Hashtable<Integer,Integer> typeIDs, Hashtable<String,Modifier> modifiers, ChangeType changeType)
+	public ModifierGroup(String identifier, ArrayList<ParseAssignment> assignments, ArrayList<ParseALE> drawConstraints, ArrayList<Integer> typeIDs, Hashtable<String,Modifier> modifiers, ChangeType changeType)
 	{
 		this.identifier = identifier;
 		this.assignments = assignments;
-		this.probabilities = probabilities;
+		this.drawConstraints = drawConstraints;
 		this.modifiers = modifiers;
 		this.typeIDs = typeIDs;
 		this.changeType = changeType;
-		probSum = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
-		{
-			probSum += probabilities.get(e.nextElement());
-		}
 	}
 	
 	public void setRNG(RNG rng)
@@ -80,7 +70,7 @@ public class ModifierGroup {
 	
 	public ModifierGroup clone()
 	{
-		return new ModifierGroup(identifier,assignments,probabilities,typeIDs,modifiers,changeType);
+		return new ModifierGroup(identifier,assignments,drawConstraints,typeIDs,modifiers,changeType);
 	}
 	
 	public ChangeType getChangeType()
@@ -161,16 +151,13 @@ public class ModifierGroup {
 				assignment.evaluate(rng, resolver);
 			}
 		}
-		int curProb = 0;
-		for (Enumeration<Integer> e = probabilities.keys(); e.hasMoreElements();)
+		for (int i = 0; i < drawConstraints.size(); i++)
 		{
-			int key = e.nextElement();
-			curProb += probabilities.get(key);
-			if (curProb/(float)probSum >= resolver.getVariable("result").floatValue())
+			if (drawConstraints.get(i).evaluate(rng, resolver).intValue() != 0)
 			{
-				return typeIDs.get(key);
+				return typeIDs.get(i);
 			}
 		}
-		return typeIDs.get(1);
+		return 0;
 	}
 }
