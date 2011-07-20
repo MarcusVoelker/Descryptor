@@ -9,7 +9,7 @@ ModifierGroup Stone {
 	result = Stone;
 	Draw Stone if result < 0.34;
 	Draw None if result < 0.67;
-	Draw Coal if 1;
+	Draw Coal;
 }
 
 Modifier Iron {
@@ -22,7 +22,7 @@ ModifierGroup Iron {
 	Modifier Iron
 	result = Iron;
 	Draw None if result < 0.67;
-	Draw Iron if 1;
+	Draw Iron;
 }
 
 Modifier Gold {
@@ -35,7 +35,7 @@ ModifierGroup Gold {
 	Modifier Gold
 	result = Gold;
 	Draw None if result < 0.71;
-	Draw Gold if 1;
+	Draw Gold;
 }
 
 Modifier SurMod {
@@ -50,7 +50,7 @@ ModifierGroup SurMod {
 	result = SurMod;
 	Draw Erase if result < 0.45;
 	Draw Sand if result < 0.55;
-	Draw None if 1;
+	Draw None;
 }
 
 Area World {

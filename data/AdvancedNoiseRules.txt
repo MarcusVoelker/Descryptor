@@ -1,0 +1,50 @@
+Modifier Worley {
+	ModType = Worley
+	count = 20;
+}
+
+Modifier Perlin {
+	ModType = Perlin
+	scale = 16;
+}
+
+ModifierGroup Worley {
+	ChangeType = Modify
+	Modifier Worley
+	Modifier Perlin
+	attractY = maxY;
+	attractDist = 0.8*abs(attractY - yPos);
+	height = maxY - minY;
+	attractCloseness = 1-attractDist/height;
+	result = attractCloseness*sqrt(Worley)/10;
+	Draw Type1 if result > 1;
+	Draw Type2 if result > 0.99;
+	Draw Type3 if result > 0.95;
+	Draw Type4 if result > 0.9;
+	Draw Type5 if result > 0.85;
+	Draw Type6 if result > 0.8;
+	Draw Type7 if result > 0.75;
+	Draw Type8 if result > 0.7;
+	Draw Type9 if result > 0.6;
+	Draw None;
+	
+}
+
+Area World {
+	Type = None
+	SubArea {
+		AreaType = Land
+		count = 1;
+		xPos = 0.0;
+		yPos = 0.0;
+		zPos = 0.0;
+		width = 1.0;
+		height = 1.0;
+		depth = 1.0;
+	}
+}
+
+Area Land {
+	Type = None
+	ModifierGroup Worley
+}

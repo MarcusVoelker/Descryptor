@@ -153,7 +153,7 @@ public class ModifierGroup {
 		}
 		for (int i = 0; i < drawConstraints.size(); i++)
 		{
-			if (drawConstraints.get(i).evaluate(rng, resolver).intValue() != 0)
+			if (drawConstraints.get(i) == null || drawConstraints.get(i).evaluate(rng, resolver).intValue() != 0)
 			{
 				return typeIDs.get(i);
 			}

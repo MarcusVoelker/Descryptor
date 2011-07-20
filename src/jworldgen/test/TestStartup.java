@@ -89,6 +89,7 @@ public class TestStartup {
 		colorMap.put("Coal", new Color(0.2f,0.2f,0.2f));
 		colorMap.put("Earth", new Color(0.4f,0.2f,0));
 		colorMap.put("Iron", new Color(0.5f,0.3f,0.4f));
+		colorMap.put("Diamond", new Color(0.5f,0.8f,0.7f));
 	}
 	private static void setDrawingStates()
 	{
@@ -138,8 +139,8 @@ public class TestStartup {
 		try {
 			long seed = (long) Math.floor((Math.random()*Long.MAX_VALUE));
 			Display.setTitle("Seed: "+Util.seedToSeedString(seed));
-			Generator gen = Generator.getGeneratorFromFile("data/TestRules.txt", seed);
-			world = gen.generateRandomly(200,200,1);
+			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
+			world = gen.generateRandomly(50,50,50);
 			drawThis = new byte[world.getWidth()][world.getHeight()][world.getDepth()];
 			blockMap = gen.getBlockMap();
 			setDrawingStates();
@@ -334,7 +335,7 @@ public class TestStartup {
 		}
 	}
 	
-	static boolean use3D = false;
+	static boolean use3D = true;
 	public static void main(String[] args)
 	{
 		try {

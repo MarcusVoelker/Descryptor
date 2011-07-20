@@ -9,8 +9,8 @@ import org.junit.Test;
 
 public class ALETest {
 
-	private static String[] ales ={"2 + 3","3 * 4 + 5 - 6","0*sin(3)+1*cos(0)-tan(0) > 0.9 && 0*sin(3)+1*cos(0)-tan(0) < 1.1"};
-	private static Number[] results ={5,11,1};
+	private static String[] ales ={"2 + 3","3 * 4 + 5 - 6","0*sin(3)+1*cos(0)-tan(0) > 0.9 && 0*sin(3)+1*cos(0)-tan(0) < 1.1","1 && 0"};
+	private static Number[] results ={5,11,1,0};
 	@Test
 	public void testALEs() throws CriticalFailure {
 		for (int i = 0; i < ales.length; i++)
