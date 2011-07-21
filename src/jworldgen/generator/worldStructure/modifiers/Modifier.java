@@ -2,10 +2,11 @@ package jworldgen.generator.worldStructure.modifiers;
 
 import java.util.ArrayList;
 
+import jworldgen.generator.Evaluatable;
 import jworldgen.generator.RNG;
 import jworldgen.parser.parseStructure.ParseAssignment;
 
-public abstract class Modifier {
+public abstract class Modifier implements Evaluatable{
 	
 	protected String identifier;
 	protected RNG rng;
@@ -38,6 +39,11 @@ public abstract class Modifier {
 	public abstract Modifier clone();
 	
 	public abstract float getValue(int x, int y, int z);
+	
+	public Number getValue(Number[] params)
+	{
+		return getValue(params[0].intValue(),params[1].intValue(),params[2].intValue());
+	}
 	
 	public ModifierType getType()
 	{

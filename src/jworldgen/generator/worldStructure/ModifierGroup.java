@@ -1,6 +1,5 @@
 package jworldgen.generator.worldStructure;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -133,19 +132,7 @@ public class ModifierGroup {
 		for (Enumeration<String> e = modifiers.keys(); e.hasMoreElements();)
 		{
 			String key = e.nextElement();
-			try{
-				try {
-					Method getValue = modifiers.get(key).getClass().getMethod("getValue",int.class,int.class,int.class);
-					resolver.addFunction(key, getValue, modifiers.get(key));
-				} catch (SecurityException e1) {
-					ExceptionLogger.logException(new InternalError("Reflection Error!"),LoggerLevel.ERROR);
-				} catch (NoSuchMethodException e1) {
-					ExceptionLogger.logException(new InternalError("No function getValue in Class "+modifiers.get(key).getClass().getCanonicalName()),LoggerLevel.ERROR);
-				}
-			}
-			catch (CriticalFailure e2) {
-				//Should not be reachable
-			}
+			resolver.addFunction(key, modifiers.get(key));
 		}
 		
 		resolver.setVariable("minX", minX);

@@ -2,22 +2,39 @@ Modifier Perlin {
 	ModType = Perlin
 	scale = 16;
 }
-Modifier Perlin2 {
+
+Modifier StoneDown {
+	ModType = WeightedPerlin
+	scale = 16;
+	heightWeight = 2.0;
+}
+
+Modifier SandHeight {
 	ModType = Perlin
 	scale = 16;
 }
-
 ModifierGroup Worley {
 	ChangeType = Modify
 	
 	Modifier Perlin
-	Modifier Perlin2
-	
+	Modifier SandHeight
+	Modifier StoneDown
 	depth = maxZ - minZ;
+	sandHeight = 4*SandHeight(xPos,yPos,zPos);
 	blockBelow = (yPos + 1 <= maxY)*(yPos + 1);
-	belowPerlin = Perlin(xPos,blockBelow,zPos);
-	Draw Sand if (belowPerlin > 0.6) && Perlin(xPos,yPos,zPos) < 0.6 && Perlin2(xPos,yPos,zPos) > 0.6;
-	Draw Stone if Perlin(xPos,yPos,zPos) > 0.6;
+	blockBelow2 = (yPos + 2 <= maxY)*(yPos + 2);
+	blockBelow3 = (yPos + 3 <= maxY)*(yPos + 3);
+	blockBelow4 = (yPos + 4 <= maxY)*(yPos + 4);
+	
+	drawStone = 2*Perlin(xPos,yPos,zPos) + StoneDown(xPos,yPos,zPos) > 1.4;
+	belowPerlin = 2*Perlin(xPos,blockBelow,zPos) + StoneDown(xPos,blockBelow,zPos) > 1.4;
+	belowPerlin2 = 2*Perlin(xPos,blockBelow2,zPos) + StoneDown(xPos,blockBelow2,zPos) > 1.4;
+	belowPerlin3 = 2*Perlin(xPos,blockBelow3,zPos) + StoneDown(xPos,blockBelow3,zPos) > 1.4;
+	belowPerlin4 = 2*Perlin(xPos,blockBelow4,zPos) + StoneDown(xPos,blockBelow4,zPos) > 1.4;
+	
+	drawSand = belowPerlin || (belowPerlin2 && sandHeight > 1) || (belowPerlin3 && sandHeight > 2) || (belowPerlin4 && sandHeight > 3);
+	Draw Sand if drawSand && !drawStone;
+	Draw Stone if drawStone;
 	Draw None;
 	
 }
