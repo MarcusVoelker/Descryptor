@@ -22,20 +22,35 @@ public class ParseALE {
 		while(!postCopy.isEmpty())
 		{
 			ALEQueueElement element = postCopy.poll();
-			switch(element.type.arity)
+			if (element.type == ALEElementType.FUNCTION)
 			{
-				case 0:
-					evaluation.push(element.toValue(rng,resolver));
-					break;
-				case 1:
-					Number v = evaluation.pop();
-					evaluation.push(element.toValue(v,rng));
-					break;
-				case 2:
-					Number v2 = evaluation.pop();
-					Number v1 = evaluation.pop();
-					evaluation.push(element.toValue(v1,v2,rng));
-					break;
+				int startPos = element.identifier.indexOf("|")+1;
+				String arityString = element.identifier.substring(startPos,element.identifier.length());
+				int arity = Integer.parseInt(arityString); 
+				Number[] params = new Number[arity];
+				for (int i = 0; i < params.length; i++)
+				{
+					params[i] = evaluation.pop();
+				}
+				evaluation.push(resolver.evaluateFunction(element.identifier.substring(0,startPos-1), params));
+			}
+			else
+			{
+				switch(element.type.arity)
+				{
+					case 0:
+						evaluation.push(element.toValue(rng,resolver));
+						break;
+					case 1:
+						Number v = evaluation.pop();
+						evaluation.push(element.toValue(v,rng));
+						break;
+					case 2:
+						Number v2 = evaluation.pop();
+						Number v1 = evaluation.pop();
+						evaluation.push(element.toValue(v1,v2,rng));
+						break;
+				}
 			}
 		}
 		return evaluation.pop();

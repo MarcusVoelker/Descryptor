@@ -46,6 +46,8 @@ public class ALEQueueElement {
 		{
 		case ABSOLUTE:
 			return Math.abs(v.intValue());
+		case FLOOR:
+			return (int) Math.floor(v.floatValue());
 		case NOT:
 			return v.intValue() == 0 ? 1 : 0;
 		case BITWISE_NOT:
@@ -172,5 +174,10 @@ public class ALEQueueElement {
 			}
 			return 0;
 		}
+	}
+	
+	public Number toValue(Number[] v, VariableResolver resolver)
+	{
+		return resolver.evaluateFunction(identifier,v);
 	}
 }

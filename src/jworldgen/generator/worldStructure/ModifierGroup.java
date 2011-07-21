@@ -1,5 +1,6 @@
 package jworldgen.generator.worldStructure;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -30,8 +31,10 @@ public class ModifierGroup {
 	private ArrayList<String> modifierNames;
 	private ArrayList<Integer> typeIDs;
 	
+	protected VariableResolver resolver;
 	protected ArrayList<ParseAssignment> assignments;
 	protected ChangeType changeType;
+
 	
 	public ModifierGroup(String identifier, ArrayList<ParseAssignment> assignments, ArrayList<ParseALE> drawConstraints, ArrayList<Integer> typeIDs, ArrayList<String> modifierNames, ChangeType changeType)
 	{
@@ -126,10 +129,35 @@ public class ModifierGroup {
 				break;
 			}
 		}
+		resolver = new VariableResolver();
+		for (Enumeration<String> e = modifiers.keys(); e.hasMoreElements();)
+		{
+			String key = e.nextElement();
+			try{
+				try {
+					Method getValue = modifiers.get(key).getClass().getMethod("getValue",int.class,int.class,int.class);
+					resolver.addFunction(key, getValue, modifiers.get(key));
+				} catch (SecurityException e1) {
+					ExceptionLogger.logException(new InternalError("Reflection Error!"),LoggerLevel.ERROR);
+				} catch (NoSuchMethodException e1) {
+					ExceptionLogger.logException(new InternalError("No function getValue in Class "+modifiers.get(key).getClass().getCanonicalName()),LoggerLevel.ERROR);
+				}
+			}
+			catch (CriticalFailure e2) {
+				//Should not be reachable
+			}
+		}
+		
+		resolver.setVariable("minX", minX);
+		resolver.setVariable("minY", minY);
+		resolver.setVariable("minZ", minZ);
+		resolver.setVariable("maxX", maxX);
+		resolver.setVariable("maxY", maxY);
+		resolver.setVariable("maxZ", maxZ);
 	}
 	public int getValue(int x, int y, int z)
 	{
-		VariableResolver resolver = new VariableResolver();
+		VariableResolver resolver = this.resolver.clone();
 		for (Enumeration<String> e = modifiers.keys(); e.hasMoreElements();)
 		{
 			String key = e.nextElement();
@@ -138,12 +166,7 @@ public class ModifierGroup {
 		resolver.setVariable("xPos", x);
 		resolver.setVariable("yPos", y);
 		resolver.setVariable("zPos", z);
-		resolver.setVariable("minX", minX);
-		resolver.setVariable("minY", minY);
-		resolver.setVariable("minZ", minZ);
-		resolver.setVariable("maxX", maxX);
-		resolver.setVariable("maxY", maxY);
-		resolver.setVariable("maxZ", maxZ);
+		
 		if (assignments != null)
 		{
 			for (ParseAssignment assignment : assignments)

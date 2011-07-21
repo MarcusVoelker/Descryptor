@@ -139,7 +139,7 @@ public class TestStartup {
 		try {
 			long seed = (long) Math.floor((Math.random()*Long.MAX_VALUE));
 			Display.setTitle("Seed: "+Util.seedToSeedString(seed));
-			Generator gen = Generator.getGeneratorFromFile("data/WorleyRules.txt", seed);
+			Generator gen = Generator.getGeneratorFromFile("data/PerlinRules.txt", seed);
 			world = gen.generateRandomly(50,50,50);
 			drawThis = new byte[world.getWidth()][world.getHeight()][world.getDepth()];
 			blockMap = gen.getBlockMap();

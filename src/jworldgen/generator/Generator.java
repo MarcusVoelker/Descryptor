@@ -10,7 +10,6 @@ import jworldgen.generator.worldStructure.Ruleset;
 import jworldgen.generator.worldStructure.TreeNodeArea;
 import jworldgen.generator.worldStructure.VoxelStack;
 import jworldgen.parser.RuleParser;
-import jworldgen.parser.parseStructure.BlockMap;
 import jworldgen.parser.parseStructure.ParseList;
 
 public class Generator {

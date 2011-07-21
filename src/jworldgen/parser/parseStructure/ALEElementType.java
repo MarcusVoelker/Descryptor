@@ -2,6 +2,9 @@ package jworldgen.parser.parseStructure;
 
 public enum ALEElementType {
 	
+	//Unknown/Dynamic arity
+	FUNCTION	(-1, -1, ALEReturnType.INPUT		),
+	
 	//0-ary nodes
 	VARIABLE	( 0, -1, ALEReturnType.INPUT		), 
 	INTEGER		( 0, -1, ALEReturnType.ALWAYS_INT	), 
@@ -16,8 +19,10 @@ public enum ALEElementType {
 	ARCTANGENT	( 1, -1, ALEReturnType.ALWAYS_FLOAT	), 
 	SQRT		( 1, -1, ALEReturnType.ALWAYS_FLOAT	), 
 	ABSOLUTE	( 1, -1, ALEReturnType.INPUT		),
+	FLOOR		( 1, -1, ALEReturnType.ALWAYS_INT	),
 	NOT			( 1,  6, ALEReturnType.ALWAYS_INT	),
 	BITWISE_NOT	( 1,  0, ALEReturnType.ALWAYS_INT	),
+	
 	//binary nodes
 	PLUS		( 2,  4, ALEReturnType.INPUT		), 
 	MINUS		( 2,  4, ALEReturnType.INPUT		), 
@@ -35,10 +40,11 @@ public enum ALEElementType {
 	OR			( 2,  7, ALEReturnType.ALWAYS_INT	),
 	BITWISE_AND	( 2,  1, ALEReturnType.ALWAYS_INT	),
 	BITWISE_OR	( 2,  1, ALEReturnType.ALWAYS_INT	),
+	
 	//Error
 	ERROR		(-1, -1, ALEReturnType.ALWAYS_INT	);
 	
-	public final int arity;
+	public int arity;
 	public final int priority;
 	public final ALEReturnType returnType;
 	private ALEElementType(int arity, int priority, ALEReturnType returnType)

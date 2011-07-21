@@ -1,17 +1,28 @@
 Modifier Perlin {
-	ModType = WeightedPerlin
-	ChangeType = Modify
-	heightWeight = 1;
+	ModType = Perlin
 	scale = 16;
-	Prob 1 = 1
-	Type 1 = None
-	Prob 2 = 1
-	Type 2 = Stone
-	Prob 3 = 1
-	Type 3 = Test
+}
+Modifier Perlin2 {
+	ModType = Perlin
+	scale = 16;
+}
+
+ModifierGroup Worley {
+	ChangeType = Modify
+	
+	Modifier Perlin
+	Modifier Perlin2
+	
+	depth = maxZ - minZ;
+	blockBelow = (yPos + 1 <= maxY)*(yPos + 1);
+	belowPerlin = Perlin(xPos,blockBelow,zPos);
+	Draw Sand if (belowPerlin > 0.6) && Perlin(xPos,yPos,zPos) < 0.6 && Perlin2(xPos,yPos,zPos) > 0.6;
+	Draw Stone if Perlin(xPos,yPos,zPos) > 0.6;
+	Draw None;
+	
 }
 
 Area World {
 	Type = None
-	Modifier Perlin
+	ModifierGroup Worley
 }

@@ -65,6 +65,20 @@ public class RuleParser
       return null;
     }
   }
+
+  private static void incTopFunction(Stack opStack)
+  {	opStack.pop();
+	if (!opStack.empty() && (opStack.peek() instanceof ALEQueueElement))
+	{	  	ALEQueueElement ele = (ALEQueueElement) opStack.peek();
+		if (ele.type == ALEElementType.FUNCTION)
+		{
+		  int startPos = ele.identifier.indexOf("|")+1;
+		  String arityString = ele.identifier.substring(startPos,ele.identifier.length());
+		  int newArity = Integer.parseInt(arityString)+1;
+		  ele.identifier = ele.identifier.substring(0,startPos-1)+"|"+newArity;		}
+	}
+	opStack.push("(");
+  }
 }
 
 PARSER_END(RuleParser)
@@ -151,6 +165,7 @@ TOKEN: /* ALE Functions */
 | < ATAN: "atan" >
 | < SQRT: "sqrt" >
 | < ABS: "abs" >
+| < FLOOR: "floor" >
 }
 TOKEN : /* Misc Identifiers */
 {
@@ -341,7 +356,7 @@ ParseALE ale():
 void aleShunt(LinkedList<ALEQueueElement>  output, Stack opStack):
 {}
 {
- 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleFunction(opStack) | aleLeaf(output))* < EOL > 
+ 	(aleBracket(output,opStack)| aleOperator(output,opStack) | aleFunction(opStack) | aleLeaf(output) | aleIdentifier(output,opStack))* < EOL > 
 }
 
 void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
@@ -357,7 +372,8 @@ void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 		{
 			output.add((ALEQueueElement) opStack.pop());
 		}
-		opStack.pop();
+		incTopFunction(opStack);
+		opStack.pop();		
 	}
 |   t = ","
 	{
@@ -365,6 +381,7 @@ void aleBracket(LinkedList<ALEQueueElement>  output, Stack opStack):
 		{
 			output.add((ALEQueueElement) opStack.pop());
 		}
+		incTopFunction(opStack);
 	}
 }
 
@@ -432,6 +449,8 @@ void aleFunction(Stack opStack):
 	  t = < SQRT > { type = ALEElementType.SQRT; }
 	|
 	  t = < ABS > { type = ALEElementType.ABSOLUTE; }
+	|
+	  t = < FLOOR > { type = ALEElementType.FLOOR; }	
 	)
 	{
 		opStack.push(new ALEQueueElement(t.image,type));
@@ -444,13 +463,29 @@ void aleLeaf(LinkedList<ALEQueueElement> output):
   	(
   	  t = < FLOAT > { type = ALEElementType.FLOAT; }
   	|
-  	  t = < IDENT > { type = ALEElementType.VARIABLE; }
-  	|
   	  t = < INTEGER > { type = ALEElementType.INTEGER; }
   	)
   	{
   	  output.add(new ALEQueueElement(t.image,type));
-  	}
+  	}	
 }
 
+void aleIdentifier(LinkedList<ALEQueueElement> output, Stack opStack):
+{Token t; ALEElementType type;}
+{
+  t = < IDENT >
+  (
+    "("
+	{
+	  type = ALEElementType.FUNCTION;
+	  opStack.push(new ALEQueueElement(t.image+"|0",type));
+	  opStack.push("(");
+	}
+  |
+	{
+	  type = ALEElementType.VARIABLE;
+	  output.add(new ALEQueueElement(t.image,type));
+	}
+  )
+}
   

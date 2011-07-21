@@ -11,7 +11,7 @@ Modifier Perlin {
 Modifier HeightStone {
 	ModType = WeightedPerlin
 	scale = 16;
-	heightWeight = 2.0;
+	heightWeight = 4.0;
 }
 
 Modifier Coal {
@@ -44,15 +44,17 @@ ModifierGroup Worley {
 	height = maxY - minY;
 	attractCloseness = 1-attractDist/height;
 	result = attractCloseness*sqrt(Perlin)*sqrt(Worley)/10;
-	drawCoal = result > 0.9 && Coal > 0.65;
+	drawGroundStone = ((yPos >= height/2) && HeightStone > 0.7);
+	drawStone = ((result > 0.6) && (HeightStone < 0.3)) || drawGroundStone;
+	drawCoal = (result > 0.8 || drawGroundStone) && Coal > 0.65;
 	
-	Draw Diamond if drawCoal && Diamond > 0.7 && result > 1.2;
+	Draw Diamond if drawCoal && Diamond > 0.5 && result > 1.0 && Coal > 0.75;
 	Draw Coal if drawCoal; 
-	Draw Gold if result > 1.0 && Gold > 0.7;
-	Draw Stone if result > 0.7;
-	Draw Stone if (result > 0.6) && (HeightStone < 0.4); 
+	Draw Gold if (result > 0.9 || drawGroundStone) && Gold > 0.7;
+	Draw Stone if result > 0.7 || drawStone;
 	Draw Earth if result > 0.6;
-	Draw Sand if (yPos == height/2) && (result > 0.55) && (result < 0.65);
+	Draw Earth if (yPos >= height/2) && HeightStone > 0.6;
+	/*Draw Sand if (yPos >= height/2) && (result > 0.55) && (result < 0.65);*/
 	Draw None;
 	
 }
