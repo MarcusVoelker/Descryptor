@@ -1,0 +1,14 @@
+Modifier Worley {
+	ModType = Worley
+	count = 20;
+}
+ModifierGroup Worley {
+	ChangeType = Modify
+	
+	Modifier Worley
+	
+}
+
+Texture {
+	
+}

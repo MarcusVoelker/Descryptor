@@ -1,0 +1,415 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.17+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  JDK_VERSION = "1.5";
+  static = false;
+}
+
+PARSER_BEGIN(RuleParser)
+package descryptor.jworldgen.parser;
+
+import java.io.StringReader;
+import java.util.Stack;
+import java.util.LinkedList;
+import descryptor.jworldgen.parser.parseStructure.*;
+import descryptor.common.parser.parseStructure.*;
+import descryptor.common.ale.ALEQueueElement;
+import descryptor.common.ale.ALEElementType;
+import descryptor.common.exceptionHandler.ExceptionLogger;
+import descryptor.common.exceptionHandler.LoggerLevel;
+import descryptor.common.exceptionHandler.exceptions.CriticalFailure;
+
+public class RuleParser
+{
+  public static ParseList parse(String ruleCode) throws CriticalFailure
+  {
+    StringReader reader = new StringReader(ruleCode);
+    RuleParser parser = new RuleParser(reader);
+    
+    ExceptionLogger.log("Reading input...", LoggerLevel.COARSE);
+    try
+    {
+      ParseList list = parser.parseRoot();
+      ExceptionLogger.log("No syntactic errors detected", LoggerLevel.COARSE);
+      return list;
+    }
+    catch (Exception e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+    catch (Error e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+  }
+
+  public static ParseALE parseALE(String aleCode) throws CriticalFailure
+  {
+    StringReader reader = new StringReader(aleCode);
+    RuleParser parser = new RuleParser(reader);
+    
+    try
+    {
+      ParseALE ale = parser.ale();
+      return ale;
+    }
+    catch (Exception e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+    catch (Error e)
+    {
+      ExceptionLogger.logException(e,LoggerLevel.CRITICAL);
+      return null;
+    }
+  }
+
+  private static void incTopFunction(Stack opStack)
+  {	opStack.pop();
+	if (!opStack.empty() && (opStack.peek() instanceof ALEQueueElement))
+	{	  	ALEQueueElement ele = (ALEQueueElement) opStack.peek();
+		if (ele.type == ALEElementType.FUNCTION)
+		{
+		  int startPos = ele.identifier.indexOf("|")+1;
+		  String arityString = ele.identifier.substring(startPos,ele.identifier.length());
+		  int newArity = Integer.parseInt(arityString)+1;
+		  ele.identifier = ele.identifier.substring(0,startPos-1)+"|"+newArity;		}
+	}
+	opStack.push("(");
+  }
+}
+
+PARSER_END(RuleParser)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| "/*": IN_COMMENT
+}
+
+< IN_COMMENT > SKIP:
+{
+  < ~[] >
+}
+
+< IN_COMMENT > SKIP :
+{
+  "*/": DEFAULT
+}
+
+TOKEN : /* Partitions */
+{
+  < AREA : "Area" >
+| < SUBAREA : "SubArea" >
+| < MODIFIER : "Modifier" >
+| < MODIFIERGROUP : "ModifierGroup" >
+}
+
+TOKEN : /* Room Keys */
+{
+  < WBLOCK : "WallBlock" >
+| < FBLOCK : "FloorBlock" >
+| < CBLOCK : "CeilingBlock" >
+| < BG : "Background" >
+}
+
+TOKEN : /* Modifier and Area Keys */
+{
+  < DRAW : "Draw" >
+| < IF : "if" >
+| < TYPE : "Type" >
+| < MODTYPE : "ModType" >
+| < CHANGETYPE : "ChangeType" >
+}
+
+TOKEN : /* SubArea Keys */
+{
+  < ATYPE : "AreaType" >
+}
+
+TOKEN: /* ALE Operators */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTIPLY : "*" >
+| < DIVIDE : "/" >
+| < MODULO : "%" >
+| < RANDOM : ":" >
+| < EQUALS : "==" >
+| < NEQUALS : "!=" >
+| < GREATER : " >" >
+| < GOE : " >=" >
+| < LESS : "< " >
+| < LOE : "<=" >
+| < AND : "&&" >
+| < OR : "||" >
+| < NOT : "!" >
+| < BIT_AND : "&" >
+| < BIT_OR : "|" >
+| < BIT_NOT : "~" >
+}
+
+TOKEN: /* ALE Functions */
+{
+  < SIN: "sin" >
+| < COS: "cos" >
+| < TAN: "tan" >
+| < ASIN: "asin" >
+| < ACOS: "acos" >
+| < ATAN: "atan" >
+| < SQRT: "sqrt" >
+| < ABS: "abs" >
+| < FLOOR: "floor" >
+}
+TOKEN : /* Misc Identifiers */
+{
+  < SPECIAL : "$" >
+| < INTEGER : (< MINUS >)? (< DIGIT >)+ >
+| < #DIGIT : [ "0"-"9" ] >
+| < IDENT : (< SPECIAL >)? ["a"-"z","A"-"Z", "_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
+| < FLOAT : < INTEGER > "." < INTEGER > >
+| < EOL : ";" >
+}
+
+ParseList parseRoot():
+{ParseList list = new ParseList();}
+{
+	partition(list)
+	{
+	  return list;
+	}
+}
+
+void partition(ParseList list) :
+{ParseArea area; ParseModifier modifier; ParseModifierGroup mGroup;}
+{
+  area = area() partition(list)
+  {
+    list.addArea(area);
+  }
+| modifier = modifier() partition(list)
+  {
+    list.addModifier(modifier);
+  }
+| mGroup = modifierGroup() partition(list)
+  {
+    list.addModifierGroup(mGroup);
+  }
+| < EOF >
+}
+
+void areaLine(ParseArea area) :
+{Token probType; Token modType;}
+{
+  < TYPE > "=" probType = < IDENT >
+  {
+    area.setType(probType.image);
+  }
+| < MODIFIERGROUP > modType = < IDENT >
+  {
+	area.addModifierGroup(modType.image);
+  }  
+}
+
+void modifierLine(ParseModifier modifier) :
+{Token probType; Token id; ParseAssignment assignment;}
+{
+  
+  < MODTYPE > "=" probType = < IDENT >
+  {
+    modifier.setType(probType.image);
+  }
+| assignment = assignment()
+  {
+    modifier.assignments.add(assignment);
+  }
+}
+
+void modifierGroupLine(ParseModifierGroup modifierGroup) :
+{Token type; ParseALE ale; ParseAssignment assignment;}
+{
+  < DRAW > type = < IDENT > 
+  (     < IF > ale = ale()
+    {      modifierGroup.addType(ale.toALE(), type.image);
+    }
+  | < EOL >
+  	{  	  modifierGroup.addType(null, type.image);
+  	}
+  )
+| < CHANGETYPE > "=" type = < IDENT >
+  {
+    modifierGroup.setChangeType(type.image);
+  }
+| < MODIFIER > type = < IDENT >
+  {
+    modifierGroup.addModifier(type.image);
+  }
+| assignment = assignment()
+  {
+    modifierGroup.assignments.add(assignment);
+  }
+}
+
+void subAreaLine(ParseSubArea subArea) :
+{Token identifier; int[] ints; float[] floats; ParseAssignment assignment;}
+{
+  < ATYPE > "=" identifier = < IDENT >
+  {
+    subArea.areaType = identifier.image;
+  }
+| assignment = assignment()
+  {
+    subArea.assignments.add(assignment);
+  }
+}
+
+void subArea(ParseArea area):
+{ParseSubArea subArea = new ParseSubArea();}
+{
+  < SUBAREA > "{" (subAreaLine(subArea))* "}"
+  {
+	area.addSubArea(subArea);
+  }
+}
+
+ParseArea area():
+{ParseArea area = new ParseArea(); Token ident;}
+{
+  < AREA > ident = < IDENT > "{" (areaLine(area) | subArea(area))* "}"
+  {
+    area.setIdentifier(ident.image);
+	return area;
+  }
+}
+
+
+ParseModifier modifier():
+{ParseModifier modifier = new ParseModifier(); Token ident;}
+{
+  < MODIFIER > ident = < IDENT > "{" (modifierLine(modifier))* "}"
+  {
+    modifier.setIdentifier(ident.image);
+	return modifier;
+  }
+}
+
+ParseModifierGroup modifierGroup():
+{ParseModifierGroup modifierGroup = new ParseModifierGroup(); Token ident;}
+{
+  < MODIFIERGROUP > ident = < IDENT > "{" (modifierGroupLine(modifierGroup))* "}"
+  {
+    modifierGroup.setIdentifier(ident.image);
+    return modifierGroup;
+  }
+}
+
+ParseAssignment assignment():
+{Token t; ParseALE ale;}
+{
+  t = < IDENT > "=" ale = ale()
+  {
+    return new ParseAssignment(t.image,ale);
+  }
+}
+
+ParseALE ale():
+{LinkedList<ALEQueueElement> output = new LinkedList();}
+{
+  (aleElement(output))* < EOL >
+  {
+    return new ParseALE(output);
+  }
+}
+
+void aleElement(LinkedList<ALEQueueElement> queue):{Token t; ALEElementType type;}
+{	(
+  	  t = < EQUALS > { type = ALEElementType.EQUALS; }
+	| 
+  	  t = < NEQUALS > { type = ALEElementType.NEQUALS; }
+  	|
+  	  t = < GREATER > { type = ALEElementType.GREATER; }
+	| 
+  	  t = < GOE > { type = ALEElementType.GOE; }
+  	|
+  	  t = < LESS > { type = ALEElementType.LESS; }
+	| 
+  	  t = < LOE > { type = ALEElementType.LOE; }
+  	| 
+  	  t = < NOT > { type = ALEElementType.NOT; }
+  	| 
+  	  t = < BIT_NOT > { type = ALEElementType.BITWISE_NOT; }
+  	| 
+  	  t = < AND > { type = ALEElementType.AND; }
+  	| 
+  	  t = < BIT_AND > { type = ALEElementType.BITWISE_AND; }
+  	| 
+  	  t = < OR > { type = ALEElementType.OR; }
+  	| 
+  	  t = < BIT_OR > { type = ALEElementType.BITWISE_OR; }
+  	| 
+  	  t = < PLUS > { type = ALEElementType.PLUS; }
+  	| 
+  	  t = < MINUS > { type = ALEElementType.MINUS; }
+  	| 
+  	  t = < MULTIPLY > { type = ALEElementType.MULTIPLY; }
+  	| 
+  	  t = < DIVIDE > { type = ALEElementType.DIVIDE; }
+  	| 
+  	  t = < MODULO > { type = ALEElementType.MODULO; }
+  	|
+  	  t = < RANDOM > { type = ALEElementType.RANDOM; }
+  	|
+  	  t = < SIN > { type = ALEElementType.SINE; }
+	|
+	  t = < COS > { type = ALEElementType.COSINE; }
+	|
+	  t = < TAN > { type = ALEElementType.TANGENT; }
+	|
+	  t = < ASIN > { type = ALEElementType.ARCSINE; }
+	|
+	  t = < ACOS > { type = ALEElementType.ARCCOSINE; }
+	|
+	  t = < ATAN > { type = ALEElementType.ARCTANGENT; }
+	|
+	  t = < SQRT > { type = ALEElementType.SQRT; }
+	|
+	  t = < ABS > { type = ALEElementType.ABSOLUTE; }
+	|
+	  t = < FLOOR > { type = ALEElementType.FLOOR; }
+	|
+	  t = < FLOAT > { type = ALEElementType.FLOAT; }
+  	|
+  	  t = < INTEGER > { type = ALEElementType.INTEGER; }
+  	|
+  	  t = "(" { type = ALEElementType.WRAPPER;}  	|
+  	  t = "," { type = ALEElementType.WRAPPER;}  	|
+  	  t = ")" { type = ALEElementType.WRAPPER;}    
+  	)
+  	{
+		queue.add(new ALEQueueElement(t.image,type));	
+  	}
+  	|
+  	  t = < IDENT >
+  	  (
+    	"("
+		{
+	  	  type = ALEElementType.FUNCTION;
+	  	  queue.add(new ALEQueueElement(t.image+"|0",type));
+	  	  queue.add(new ALEQueueElement("(",ALEElementType.WRAPPER));
+		}
+  	  |
+		{
+	  	  type = ALEElementType.VARIABLE;
+	  	  queue.add(new ALEQueueElement(t.image,type));
+		}
+  	  )
+}
+  
