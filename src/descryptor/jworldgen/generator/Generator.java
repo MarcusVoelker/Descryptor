@@ -52,6 +52,18 @@ public class Generator extends AbstractGenerator{
 		world.setValue(x, y, z, stack.evaluate());
 	}
 	
+	public int calculateBlock(int x, int y, int z) {
+		VoxelStack stack = new VoxelStack();
+		this.world.setValue(new RNG(seed,x,y,z), stack, x, y, z);
+		return stack.evaluate();
+	}
+	
+	public String calculateBlockName(int x, int y, int z) {
+		int id = calculateBlock(x,y,z);
+		Hashtable<Integer,String> blockmap = rules.getBlockMap();
+		return blockmap.get(id);
+	}
+	
 	public Hashtable<Integer,String> getBlockMap()
 	{
 		return rules.getBlockMap();
